@@ -78,5 +78,6 @@
   }
 
   makeUI();
-  setInterval(inspectGame,500);
+  // Verificação mais leve: o HUD e a progressão não precisam de polling a cada 500 ms.
+  setInterval(inspectGame,1000);
 })();

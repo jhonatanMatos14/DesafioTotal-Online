@@ -12,9 +12,14 @@ const ROOT = __dirname;
 app.get('/', (_req, res) => {
   try {
     let html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
-    const tags = ['<link rel="stylesheet" href="board-size.css?v=1">', '<script src="extras.js"></script>'];
+    const tags = [
+      '<link rel="stylesheet" href="board-size.css?v=1">',
+      '<script src="extras.js"></script>',
+      '<script src="reward-system.js?v=1"></script>'
+    ];
     if (!html.includes(tags[0])) html = html.replace('</head>', `${tags[0]}\n</head>`);
     if (!html.includes(tags[1])) html = html.replace('</body>', `${tags[1]}\n</body>`);
+    if (!html.includes(tags[2])) html = html.replace('</body>', `${tags[2]}\n</body>`);
     res.type('html').send(html);
   } catch (error) { res.status(500).send('Erro ao carregar o jogo.'); }
 });

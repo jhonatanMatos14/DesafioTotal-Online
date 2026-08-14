@@ -48,7 +48,97 @@ body{overflow-x:hidden}.tela{display:none}.tela.ativa{display:block}
 /* O rodapé sobe e fica praticamente encostado ao tabuleiro */
 .rodape-jogo{position:relative;z-index:10;margin:-34px auto 0;gap:10px;max-width:760px;padding:0 8px}
 .rodape-jogo .dado{width:72px;height:72px;flex-basis:72px;font-size:42px;border-radius:17px;box-shadow:0 6px 0 #888,0 9px 18px #0008}
-.rodape-jogo .jogar-dado{width:225px!important;height:58px!important}
+/* ===== BOTÃO JOGAR DADO ===== */
+
+.rodape-jogo .jogar-dado{
+  width:250px !important;
+  min-height:64px !important;
+  padding:14px 24px !important;
+
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+
+  border:2px solid #39ff88 !important;
+  border-radius:16px !important;
+
+  background:linear-gradient(135deg,#123c2b,#087a45) !important;
+
+  color:#fff !important;
+  font-size:21px !important;
+  font-weight:900 !important;
+
+  cursor:pointer;
+
+  box-shadow:
+    0 0 12px rgba(57,255,136,.35),
+    0 8px 22px rgba(0,0,0,.45);
+
+  transition:
+    transform .18s ease,
+    box-shadow .18s ease,
+    filter .18s ease,
+    opacity .18s ease;
+}
+
+/* Quando é a vez do jogador */
+.rodape-jogo .jogar-dado:not(:disabled){
+  animation:pulsarDado 1.8s ease-in-out infinite;
+}
+
+.rodape-jogo .jogar-dado:not(:disabled):hover{
+  transform:translateY(-3px) scale(1.03);
+  filter:brightness(1.15);
+
+  box-shadow:
+    0 0 20px rgba(57,255,136,.55),
+    0 10px 28px rgba(0,0,0,.5);
+}
+
+.rodape-jogo .jogar-dado:not(:disabled):active{
+  transform:translateY(2px) scale(.97);
+}
+
+/* Quando NÃO é a vez */
+.rodape-jogo .jogar-dado:disabled{
+  cursor:not-allowed;
+  opacity:.45;
+
+  background:linear-gradient(135deg,#252b31,#15191d) !important;
+
+  border-color:#59616a !important;
+  color:#9da5ad !important;
+
+  box-shadow:0 4px 12px rgba(0,0,0,.3);
+
+  animation:none;
+}
+
+/* Brilho do botão */
+@keyframes pulsarDado{
+  0%,100%{
+    box-shadow:
+      0 0 12px rgba(57,255,136,.35),
+      0 8px 22px rgba(0,0,0,.45);
+  }
+
+  50%{
+    box-shadow:
+      0 0 24px rgba(57,255,136,.65),
+      0 10px 28px rgba(0,0,0,.5);
+  }
+}
+
+/* Celular */
+@media (max-width:650px){
+  .rodape-jogo .jogar-dado{
+    width:100% !important;
+    max-width:280px;
+    min-height:58px !important;
+    font-size:18px !important;
+  }
+}
 .mensagem-jogo{margin:5px auto 0}
 @media(max-width:1250px){.tabuleiro{min-height:700px}.rodape-jogo{margin:-28px auto 0}.tabuleiro:before{width:270px;height:120px;font-size:25px}}
 @media(max-width:950px){.tabuleiro{min-height:620px;grid-template-columns:repeat(16,1fr);grid-template-rows:repeat(10,1fr)}.rodape-jogo{margin:6px auto 0;position:relative}.tabuleiro:before{width:230px;height:100px;font-size:21px}}

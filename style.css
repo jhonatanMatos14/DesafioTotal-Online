@@ -1116,3 +1116,56 @@ button.jogar-dado,
         0 6px 18px rgba(0,0,0,.55),
         0 0 18px rgba(25,216,107,.55) !important;
 }
+/* ===== CORREÇÃO FINAL DO BOTÃO JOGAR DADO ===== */
+
+#btnDado {
+    position: relative !important;
+
+    /* remove a posição fixa que estava colocando no tabuleiro */
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+
+    transform: none !important;
+
+    /* tamanho menor */
+    width: 120px !important;
+    min-width: 120px !important;
+    max-width: 120px !important;
+
+    height: 48px !important;
+    min-height: 48px !important;
+
+    padding: 6px 10px !important;
+
+    margin: 0 8px !important;
+
+    font-size: 15px !important;
+    line-height: 1.1 !important;
+
+    z-index: 10 !important;
+}
+
+/* mantém o botão junto dos outros botões do rodapé */
+.rodape-jogo {
+    position: relative !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    gap: 8px !important;
+
+    z-index: 100 !important;
+}
+
+/* garante que nenhum estilo antigo faça o botão voltar para o mapa */
+.rodape-jogo #btnDado {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    top: auto !important;
+    bottom: auto !important;
+    transform: none !important;
+}

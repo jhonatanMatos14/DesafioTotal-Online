@@ -13,7 +13,6 @@ const io = new Server(server, {
 
 const ROOT = __dirname;
 
-// Carrega o jogo normalmente, mas injeta os novos recursos no HTML.
 app.get('/', (_req, res) => {
   try {
     let html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
@@ -76,7 +75,8 @@ io.on('connection', socket => {
       hostId: socket.id,
       started: false,
       players: [{ id: socket.id, name, index: 0, color: COLORS[0] }],
-      state: null
+      state: null,
+      lastPublishedState: null
     };
 
     rooms.set(roomCode, room);
@@ -120,6 +120,7 @@ io.on('connection', socket => {
 
     room.started = true;
     room.state = { jogadorAtual: 0, partidaTerminou: false };
+    room.lastPublishedState = null;
     io.to(room.code).emit('gameStarted', { players: roomInfo(room).players });
   });
 
@@ -163,6 +164,13 @@ io.on('connection', socket => {
       jogadorAtual: Number.isInteger(Number(state.jogadorAtual)) ? Number(state.jogadorAtual) : 0,
       partidaTerminou: !!state.partidaTerminou
     };
+
+    // Evita reenviar o mesmo estado dezenas de vezes por segundo.
+    // O host continua podendo publicar a cada 250 ms, mas a rede e os
+    // jogadores remotos só recebem uma atualização quando algo mudou.
+    const stateKey = JSON.stringify(state);
+    if (stateKey === room.lastPublishedState) return;
+    room.lastPublishedState = stateKey;
 
     socket.to(room.code).emit('stateUpdate', state);
   });

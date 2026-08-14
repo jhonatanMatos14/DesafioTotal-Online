@@ -74,15 +74,65 @@
   }
   function publish(){ if(isHost && started) socket.emit('publishState',snapshot()); }
   setInterval(publish,350);
+function renderRemote(s){
+    if(!s) return;
 
-  function renderRemote(s){
-    if(!s) return; lastState=s;
-    jogadores=s.players.map(p=>({...p})); jogadorAtual=s.jogadorAtual; partidaTerminou=s.partidaTerminou; historico=s.historico||[];
-    setSet(CASAS_PERGUNTA,s.sets.pergunta); setSet(CASAS_DESAFIO,s.sets.desafio); setSet(CASAS_CARTA,s.sets.carta); setSet(CASAS_BONUS,s.sets.bonus); setSet(CASAS_PENALIDADE,s.sets.penalidade); setSet(CASAS_CAO,s.sets.caos);
-    dado.textContent=s.dado||'🎲'; mensagemJogo.textContent=s.mensagem||''; criarTabuleiro(); atualizarTodasAsPecas(); atualizarPlacar(); atualizarJogador(); renderHistorico();
+    const dadoAnterior = lastState?.dado;
+    lastState = s;
+    const historicoAnterior = lastState?.historico?.length || 0;
+
+    lastState = s;
+
+    jogadores = s.players.map(p=>({...p}));
+    jogadorAtual = s.jogadorAtual;
+    partidaTerminou = s.partidaTerminou;
+    historico = s.historico || [];
+
+    setSet(CASAS_PERGUNTA, s.sets.pergunta);
+    setSet(CASAS_DESAFIO, s.sets.desafio);
+    setSet(CASAS_CARTA, s.sets.carta);
+    setSet(CASAS_BONUS, s.sets.bonus);
+    setSet(CASAS_PENALIDADE, s.sets.penalidade);
+    setSet(CASAS_CAO, s.sets.caos);
+
+    dado.textContent = s.dado;
+
+    mensagemJogo.textContent = s.mensagem || '';
+
+    criarTabuleiro();
+    atualizarJogador();
+    renderHistorico();
+
     renderModalRemote(s);
+
     btnDado.disabled = !(me && Number(me.index) === Number(jogadorAtual));
-  }
+
+    /* ===== ANIMAÇÃO DO DADO PARA TODOS OS JOGADORES ===== */
+
+    const houveNovaRolagem =
+        dadoAnterior !== undefined &&
+        (
+            s.dado !== dadoAnterior ||
+            historico.length > historicoAnterior
+        );
+
+    if(houveNovaRolagem){
+
+        /* Remove a animação anterior */
+        dado.classList.remove('girando');
+
+        /* Força o navegador a reiniciar a animação */
+        void dado.offsetWidth;
+
+        /* Inicia a animação novamente */
+        dado.classList.add('girando');
+
+        /* Remove depois que terminar */
+        setTimeout(() => {
+            dado.classList.remove('girando');
+        }, 1700);
+    }
+}
   socket.on('stateUpdate',renderRemote);
 
   function renderModalRemote(s){

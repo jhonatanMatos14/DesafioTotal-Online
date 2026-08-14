@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Desafio Total</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="visual-upgrade.css">
 </head>
 <body>
 
@@ -15,218 +16,40 @@
         <div class="menu-brand">DESAFIO <span>TOTAL</span></div>
         <h1>CAOS. ESTRATÉGIA. VITÓRIA.</h1>
         <p class="menu-subtitle">Um board game gamer de perguntas, cartas, desafios e reviravoltas.</p>
-
-        <div class="menu-stats">
-            <div><strong>120</strong><span>CASAS</span></div>
-            <div><strong>8</strong><span>JOGADORES</span></div>
-            <div><strong>∞</strong><span>REPLAY</span></div>
-        </div>
-
+        <div class="menu-stats"><div><strong>120</strong><span>CASAS</span></div><div><strong>8</strong><span>JOGADORES</span></div><div><strong>∞</strong><span>REPLAY</span></div></div>
         <button id="btnJogar" class="btn btn-verde btn-principal">🎮 INICIAR PARTIDA</button>
-        <div class="menu-secondary">
-            <button id="btnComoJogar" class="btn btn-azul">❓ COMO JOGAR</button>
-            <button id="btnConfiguracoes" class="btn btn-cinza">⚙️ CONFIGURAÇÕES</button>
-        </div>
+        <div class="menu-secondary"><button id="btnComoJogar" class="btn btn-azul">❓ COMO JOGAR</button><button id="btnConfiguracoes" class="btn btn-cinza">⚙️ CONFIGURAÇÕES</button></div>
         <div class="menu-tags"><span>⚽ FUTEBOL</span><span>🎮 GAMES</span><span>🌎 GERAL</span><span>🔥 CAOS</span></div>
     </div>
 </main>
 
-<main class="tela tela-jogadores" id="telaJogadores">
-    <h2>👥 QUANTOS JOGADORES?</h2>
-    <p>Escolha de 2 a 8 jogadores</p>
-    <div class="quantidade-jogadores">
-        <button class="btnQuantidade" data-jogadores="2">2</button><button class="btnQuantidade" data-jogadores="3">3</button>
-        <button class="btnQuantidade" data-jogadores="4">4</button><button class="btnQuantidade" data-jogadores="5">5</button>
-        <button class="btnQuantidade" data-jogadores="6">6</button><button class="btnQuantidade" data-jogadores="7">7</button>
-        <button class="btnQuantidade" data-jogadores="8">8</button>
-    </div>
-    <button id="btnVoltar" class="btn btn-cinza">⬅️ VOLTAR</button>
-</main>
+<main class="tela tela-jogadores" id="telaJogadores"><h2>👥 QUANTOS JOGADORES?</h2><p>Escolha de 2 a 8 jogadores</p><div class="quantidade-jogadores"><button class="btnQuantidade" data-jogadores="2">2</button><button class="btnQuantidade" data-jogadores="3">3</button><button class="btnQuantidade" data-jogadores="4">4</button><button class="btnQuantidade" data-jogadores="5">5</button><button class="btnQuantidade" data-jogadores="6">6</button><button class="btnQuantidade" data-jogadores="7">7</button><button class="btnQuantidade" data-jogadores="8">8</button></div><button id="btnVoltar" class="btn btn-cinza">⬅️ VOLTAR</button></main>
 
-<main class="tela tela-configuracao" id="telaConfiguracao">
-    <h2>👥 CONFIGURE OS JOGADORES</h2>
-    <p>Digite o nome de cada jogador</p>
-    <div id="listaJogadores"></div>
-    <button id="btnComecarPartida" class="btn btn-verde">🎲 COMEÇAR PARTIDA</button>
-    <button id="btnVoltarJogadores" class="btn btn-cinza">⬅️ VOLTAR</button>
-</main>
+<main class="tela tela-configuracao" id="telaConfiguracao"><h2>👥 CONFIGURE OS JOGADORES</h2><p>Digite o nome de cada jogador</p><div id="listaJogadores"></div><button id="btnComecarPartida" class="btn btn-verde">🎲 COMEÇAR PARTIDA</button><button id="btnVoltarJogadores" class="btn btn-cinza">⬅️ VOLTAR</button></main>
 
-<main class="tela tela-info" id="telaComoJogar">
-    <h2>❓ COMO JOGAR</h2>
-    <div class="regras">
-        <p>🎯 O objetivo é chegar primeiro à casa <strong>120</strong>.</p>
-        <p>🎲 Clique em <strong>JOGAR DADO</strong> para lançar o dado.</p>
-        <p>❓ Perguntas: acerte e ganhe 5 pontos; erre e perca 2.</p>
-        <p>🔥 Desafios podem fazer você perder pontos ou recuar.</p>
-        <p>🃏 Cartas especiais podem ajudar ou atrapalhar.</p>
-        <p>🏆 Quem chegar à casa 120 primeiro vence.</p>
-    </div>
-    <button id="btnVoltarInfo" class="btn btn-cinza">⬅️ VOLTAR</button>
-</main>
+<main class="tela tela-info" id="telaComoJogar"><h2>❓ COMO JOGAR</h2><div class="regras"><p>🎯 O objetivo é chegar primeiro à casa <strong>120</strong>.</p><p>🎲 Clique em <strong>JOGAR DADO</strong> para lançar o dado.</p><p>❓ Perguntas: acerte e ganhe 5 pontos; erre e perca 2.</p><p>🔥 Desafios podem fazer você perder pontos ou recuar.</p><p>🃏 Cartas especiais podem ajudar ou atrapalhar.</p><p>🏆 Quem chegar à casa 120 primeiro vence.</p></div><button id="btnVoltarInfo" class="btn btn-cinza">⬅️ VOLTAR</button></main>
 
-<main class="tela tela-info" id="telaConfiguracoesMenu">
-    <h2>⚙️ CONFIGURAÇÕES</h2>
-    <div class="regras">
-        <p>🎲 <strong>Desafio Total</strong></p>
-        <p>Tabuleiro com 120 casas, perguntas, desafios, bônus, penalidades e cartas especiais.</p>
-    </div>
-    <button id="btnVoltarConfig" class="btn btn-cinza">⬅️ VOLTAR</button>
-</main>
+<main class="tela tela-info" id="telaConfiguracoesMenu"><h2>⚙️ CONFIGURAÇÕES</h2><div class="regras"><p>🎲 <strong>Desafio Total</strong></p><p>Tabuleiro com 120 casas, perguntas, desafios, bônus, penalidades e cartas especiais.</p></div><button id="btnVoltarConfig" class="btn btn-cinza">⬅️ VOLTAR</button></main>
 
 <main class="tela tela-tabuleiro" id="telaTabuleiro">
-    <div class="layout-jogo">
-        <!-- PAINEL ESQUERDO -->
-        <aside class="painel lateral-esquerdo">
-            <div class="marca">
-                <div class="marca-titulo">DESAFIO<br><span>TOTAL</span></div>
-                <div class="marca-icones">⚽ 🎮</div>
-            </div>
-
-            <div class="vez-box">
-                <span>🟣 VEZ DE:</span>
-                <strong id="jogadorDaVez">Jogador 1</strong>
-            </div>
-
-            <section class="painel-box">
-                <h3>JOGADORES</h3>
-                <div id="placar" class="placar"></div>
-            </section>
-
-            <section class="painel-box painel-status">
-                <div class="status-header"><span class="live-dot"></span><span>PARTIDA ONLINE</span></div>
-                <div class="status-grid"><div><small>OBJETIVO</small><strong>CASA 120</strong></div><div><small>TIPO</small><strong>CAOS TOTAL</strong></div></div>
-            </section>
-
-            <section class="painel-box legenda">
-                <h3>LEGENDA</h3>
-                <div><b class="leg azul">?</b> PERGUNTA</div>
-                <div><b class="leg vermelho">🔥</b> DESAFIO</div>
-                <div><b class="leg roxo">★</b> CARTA ESPECIAL</div>
-                <div><b class="leg vermelho">☠</b> PERDE / VOLTA</div>
-                <div><b class="leg amarelo">★</b> PONTOS EXTRAS</div>
-                <div><b class="leg caos">💥</b> CAOS TOTAL</div>
-                <div><b class="leg verde">🏁</b> CHEGADA</div>
-            </section>
-
-            <section class="dica-box">
-                <strong>💡 DICA</strong>
-                <p>Responda perguntas, complete desafios e use as cartas especiais para chegar primeiro à casa 120!</p>
-            </section>
-        
-        </aside>
-
-        <!-- TABULEIRO -->
-        <section class="area-tabuleiro">
-            <div class="tabuleiro-topo">
-                <span>🏟️ DESAFIO TOTAL</span>
-                <span>120 CASAS • FUTEBOL • GAMES • GERAL</span>
-            </div>
-            <div class="tabuleiro" id="tabuleiro"></div>
-           
-        </section>
-
-        <!-- PAINEL DIREITO -->
-        <aside class="painel lateral-direito">
-            <section class="painel-box painel-dado">
-    <h3>JOGAR DADO</h3>
-
-    <button id="btnDado" class="botao-dado">
-        <span id="iconeDado">🎲</span>
-        <span>JOGAR DADO</span>
-    </button>
-
-    <div id="resultadoDado" class="resultado-dado">
-        Pronto para jogar
-    </div>
-</section>
-            <section class="painel-box cartas-painel">
-                <h3>CARTAS ESPECIAIS</h3>
-                <div class="carta-info verde"><b>↗️ AVANCE 3 CASAS</b><span>Vá para frente 3 casas.</span></div>
-                <div class="carta-info amarelo"><b>⏩ AVANCE 5 CASAS</b><span>Vá para frente 5 casas.</span></div>
-                <div class="carta-info vermelho"><b>↩️ VOLTE 3 CASAS</b><span>Volte 3 casas.</span></div>
-                <div class="carta-info azul"><b>⭐ GANHE 5 PONTOS</b><span>Adicione 5 pontos.</span></div>
-                <div class="carta-info roxo"><b>🎲 JOGUE NOVAMENTE</b><span>Jogue o dado novamente.</span></div>
-                <div class="carta-info dourado"><b>🛡️ ESCUDO DA SORTE</b><span>Protege do próximo desafio.</span></div>
-            </section>
-
-            <section class="painel-box historico-box">
-                <div class="painel-titulo-linha"><h3>ÚLTIMAS AÇÕES</h3><span class="mini-live">LIVE</span></div>
-                <div id="historicoAcoes"></div>
-            </section>
-            <div class="painel-footer">DESAFIO TOTAL <span>v2.5</span></div>
-        </aside>
-    </div>
-
-    <div class="rodape-jogo">
-        <button id="btnReiniciar" class="btn btn-azul pequeno">🔄 NOVA PARTIDA</button>
-        <div class="dado" id="dado">⚄</div>
-      
-        <button id="btnMenu" class="btn btn-cinza pequeno">🏠 MENU</button>
-    </div>
-
-    <div id="mensagemJogo" class="mensagem-jogo">Prepare-se!</div>
+<div class="layout-jogo">
+<aside class="painel lateral-esquerdo"><div class="marca"><div class="marca-titulo">DESAFIO<br><span>TOTAL</span></div><div class="marca-icones">⚽ 🎮</div></div><div class="vez-box"><span>🟣 VEZ DE:</span><strong id="jogadorDaVez">Jogador 1</strong></div><section class="painel-box"><h3>JOGADORES</h3><div id="placar" class="placar"></div></section><section class="painel-box painel-status"><div class="status-header"><span class="live-dot"></span><span>PARTIDA ONLINE</span></div><div class="status-grid"><div><small>OBJETIVO</small><strong>CASA 120</strong></div><div><small>TIPO</small><strong>CAOS TOTAL</strong></div></div></section><section class="painel-box legenda"><h3>LEGENDA</h3><div><b class="leg azul">?</b> PERGUNTA</div><div><b class="leg vermelho">🔥</b> DESAFIO</div><div><b class="leg roxo">★</b> CARTA ESPECIAL</div><div><b class="leg vermelho">☠</b> PERDE / VOLTA</div><div><b class="leg amarelo">★</b> PONTOS EXTRAS</div><div><b class="leg caos">💥</b> CAOS TOTAL</div><div><b class="leg verde">🏁</b> CHEGADA</div></section><section class="dica-box"><strong>💡 DICA</strong><p>Responda perguntas, complete desafios e use as cartas especiais para chegar primeiro à casa 120!</p></section></aside>
+<section class="area-tabuleiro"><div class="tabuleiro-topo"><span>🏟️ DESAFIO TOTAL</span><span>120 CASAS • FUTEBOL • GAMES • GERAL</span></div><div class="tabuleiro" id="tabuleiro"></div></section>
+<aside class="painel lateral-direito"><section class="painel-box painel-dado"><h3>JOGAR DADO</h3><button id="btnDado" class="botao-dado"><span id="iconeDado">🎲</span><span>JOGAR DADO</span></button><div id="resultadoDado" class="resultado-dado">Pronto para jogar</div></section><section class="painel-box cartas-painel"><h3>CARTAS ESPECIAIS</h3><div class="carta-info verde"><b>↗️ AVANCE 3 CASAS</b><span>Vá para frente 3 casas.</span></div><div class="carta-info amarelo"><b>⏩ AVANCE 5 CASAS</b><span>Vá para frente 5 casas.</span></div><div class="carta-info vermelho"><b>↩️ VOLTE 3 CASAS</b><span>Volte 3 casas.</span></div><div class="carta-info azul"><b>⭐ GANHE 5 PONTOS</b><span>Adicione 5 pontos.</span></div><div class="carta-info roxo"><b>🎲 JOGUE NOVAMENTE</b><span>Jogue o dado novamente.</span></div><div class="carta-info dourado"><b>🛡️ ESCUDO DA SORTE</b><span>Protege do próximo desafio.</span></div></section><section class="painel-box historico-box"><div class="painel-titulo-linha"><h3>ÚLTIMAS AÇÕES</h3><span class="mini-live">LIVE</span></div><div id="historicoAcoes"></div></section><div class="painel-footer">DESAFIO TOTAL <span>v2.5</span></div></aside>
+</div>
+<div class="rodape-jogo"><button id="btnReiniciar" class="btn btn-azul pequeno">🔄 NOVA PARTIDA</button><div class="dado" id="dado">⚄</div><button id="btnMenu" class="btn btn-cinza pequeno">🏠 MENU</button></div><div id="mensagemJogo" class="mensagem-jogo">Prepare-se!</div>
 </main>
 
-<div class="modal-desafio" id="modalDesafio">
-    <div class="caixa-desafio">
-        <div class="desafio-cabecalho">🔥 DESAFIO</div>
-        <h3 id="textoDesafio">Desafio</h3>
-        <p id="efeitoDesafio">Escolha uma resposta para cumprir o desafio.</p>
-        <div class="opcoes-desafio" id="opcoesDesafio"></div>
-    </div>
-</div>
-
-<div class="modal-pergunta" id="modalPergunta">
-    <div class="caixa-pergunta">
-        <div class="pergunta-cabecalho"><span id="temaPergunta">🎯 Pergunta</span><span id="regraPergunta">Acertou: +5 • Errou: -3 e -2 casas</span></div>
-        <h3 id="textoPergunta">Pergunta</h3>
-        <div class="opcoes-pergunta" id="opcoesPergunta"></div>
-    </div>
-</div>
-
-
-<div class="modal-carta" id="modalCarta">
-    <div class="caixa-carta">
-        <div class="carta-cabecalho">🃏 CARTA ESPECIAL</div>
-        <h3 id="textoCarta">Carta</h3>
-        <p id="efeitoCarta">Efeito</p>
-        <button id="btnUsarCarta" class="btn btn-verde">✨ USAR CARTA</button>
-    </div>
-</div>
-
-<div class="modal-caos" id="modalCaos">
-    <div class="caixa-caos">
-        <div class="caos-cabecalho">💥 EVENTO CAOS TOTAL</div>
-        <h3 id="textoCaos">Evento</h3>
-        <p id="efeitoCaos">Efeito</p>
-        <button id="btnConcluirCaos" class="btn btn-verde">💥 APLICAR EFEITO</button>
-    </div>
-</div>
+<div class="modal-desafio" id="modalDesafio"><div class="caixa-desafio"><div class="desafio-cabecalho">🔥 DESAFIO</div><h3 id="textoDesafio">Desafio</h3><p id="efeitoDesafio">Escolha uma resposta para cumprir o desafio.</p><div class="opcoes-desafio" id="opcoesDesafio"></div></div></div>
+<div class="modal-pergunta" id="modalPergunta"><div class="caixa-pergunta"><div class="pergunta-cabecalho"><span id="temaPergunta">🎯 Pergunta</span><span id="regraPergunta">Acertou: +5 • Errou: -3 e -2 casas</span></div><h3 id="textoPergunta">Pergunta</h3><div class="opcoes-pergunta" id="opcoesPergunta"></div></div></div>
+<div class="modal-carta" id="modalCarta"><div class="caixa-carta"><div class="carta-cabecalho">🃏 CARTA ESPECIAL</div><h3 id="textoCarta">Carta</h3><p id="efeitoCarta">Efeito</p><button id="btnUsarCarta" class="btn btn-verde">✨ USAR CARTA</button></div></div>
+<div class="modal-caos" id="modalCaos"><div class="caixa-caos"><div class="caos-cabecalho">💥 EVENTO CAOS TOTAL</div><h3 id="textoCaos">Evento</h3><p id="efeitoCaos">Efeito</p><button id="btnConcluirCaos" class="btn btn-verde">💥 APLICAR EFEITO</button></div></div>
 
 <script src="script.js"></script>
 <script src="/socket.io/socket.io.js"></script>
 <script src="online.js"></script>
+<script src="extras.js"></script>
 
-<div id="onlineOverlay" class="online-overlay">
-  <div class="online-card">
-    <div class="online-badge">● MULTIPLAYER ONLINE</div>
-    <h2>🌐 DESAFIO TOTAL ONLINE</h2>
-    <p id="onlineStatus">Conectando ao servidor...</p>
-    <div id="onlineJoin">
-      <input id="onlineName" maxlength="20" placeholder="Seu nome">
-      <button id="btnCriarSala" class="btn btn-verde">🎮 CRIAR SALA</button>
-      <div class="online-sep">OU</div>
-      <input id="onlineRoom" maxlength="6" placeholder="Código da sala">
-      <button id="btnEntrarSala" class="btn btn-azul">🚪 ENTRAR NA SALA</button>
-    </div>
-    <div id="onlineRoomView" hidden>
-      <div class="room-code">SALA <strong id="onlineRoomCode">------</strong></div>
-      <div id="onlinePlayers"></div>
-      <button id="btnIniciarOnline" class="btn btn-verde" hidden>🚀 INICIAR PARTIDA</button>
-      <button id="btnSairSala" class="btn btn-cinza">SAIR DA SALA</button>
-    </div>
-    <small>Compartilhe o código da sala com seus amigos.</small>
-  </div>
-</div>
+<div id="onlineOverlay" class="online-overlay"><div class="online-card"><div class="online-badge">● MULTIPLAYER ONLINE</div><h2>🌐 DESAFIO TOTAL ONLINE</h2><p id="onlineStatus">Conectando ao servidor...</p><div id="onlineJoin"><input id="onlineName" maxlength="20" placeholder="Seu nome"><button id="btnCriarSala" class="btn btn-verde">🎮 CRIAR SALA</button><div class="online-sep">OU</div><input id="onlineRoom" maxlength="6" placeholder="Código da sala"><button id="btnEntrarSala" class="btn btn-azul">🚪 ENTRAR NA SALA</button></div><div id="onlineRoomView" hidden><div class="room-code">SALA <strong id="onlineRoomCode">------</strong></div><div id="onlinePlayers"></div><button id="btnIniciarOnline" class="btn btn-verde" hidden>🚀 INICIAR PARTIDA</button><button id="btnSairSala" class="btn btn-cinza">SAIR DA SALA</button></div><small>Compartilhe o código da sala com seus amigos.</small></div></div>
 </body>
 </html>

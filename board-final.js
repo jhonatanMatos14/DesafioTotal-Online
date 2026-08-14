@@ -3,18 +3,20 @@
   if (!board) return;
 
   function melhorarBonecos() {
-    const players = Array.isArray(window.jogadores) ? window.jogadores : [];
-    const current = Number(window.jogadorAtual);
+    const pieces = [...board.querySelectorAll('.peca-jogador')];
+    const activeRow = document.querySelector('.placar-jogador.jogador-ativo');
+    const activeName = activeRow?.querySelector('span')?.textContent?.replace(/^\d+\.\s*/, '').trim();
+    const finished = !activeRow;
 
-    board.querySelectorAll('.peca-jogador').forEach((piece, index) => {
-      const jogador = players[index];
-      if (!jogador) return;
-
-      piece.dataset.nome = jogador.nome || `Jogador ${index + 1}`;
-      piece.classList.toggle('ativo', index === current && !window.partidaTerminou);
+    pieces.forEach((piece, index) => {
+      const title = piece.getAttribute('title') || '';
+      const name = title.split(' • ')[0] || `Jogador ${index + 1}`;
+      piece.dataset.nome = name;
+      const active = !finished && name === activeName;
+      piece.classList.toggle('ativo', active);
 
       let arrow = piece.querySelector('.turn-arrow');
-      if (index === current && !window.partidaTerminou) {
+      if (active) {
         if (!arrow) {
           arrow = document.createElement('span');
           arrow.className = 'turn-arrow';
@@ -27,11 +29,13 @@
     });
 
     board.querySelectorAll('.casa').forEach(casa => casa.classList.remove('atual-jogador'));
-    const ativo = players[current];
-    if (ativo) {
-      const pos = ativo.posicaoVisual || ativo.posicao;
-      const casa = board.querySelector(`[data-posicao="${pos}"]`);
-      if (casa) casa.classList.add('atual-jogador');
+    if (activeRow) {
+      const strong = activeRow.querySelector('strong')?.textContent || '';
+      const match = strong.match(/Casa\s+(\d+)/i);
+      if (match) {
+        const casa = board.querySelector(`[data-posicao="${match[1]}"]`);
+        if (casa) casa.classList.add('atual-jogador');
+      }
     }
   }
 

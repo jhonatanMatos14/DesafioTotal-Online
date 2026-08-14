@@ -158,15 +158,19 @@ function renderRemote(s){
     if(s.phase==='pergunta'){
       temaPergunta.textContent=`${s.modal.tema}${s.modal.dificuldade==='difícil'?' • 🧠 DIFÍCIL':''}`;
       regraPergunta.textContent=`Acertou: +${s.modal.dificuldade==='difícil'?10:5} • Errou: -${s.modal.dificuldade==='difícil'?5:3} e -${s.modal.dificuldade==='difícil'?3:2} casas`;
-      textoPergunta.textContent=s.modal.pergunta; opcoesPergunta.innerHTML=''; s.modal.opcoes.forEach((o,i)=>{const b=document.createElement('button');b.className='opcao-pergunta';b.textContent=`${String.fromCharCode(65+i)}) ${o}`;b.disabled=me?.index!==s.jogadorAtual;b.onclick=()=>sendAction('answerQuestion',{index:i});opcoesPergunta.appendChild(b)}); modalPergunta.classList.add('aberta');
+      textoPergunta.textContent=s.modal.pergunta; opcoesPergunta.innerHTML=''; s.modal.opcoes.forEach((o,i)=>{const b=document.createElement('button');b.className='opcao-pergunta';b.textContent=`${String.fromCharCode(65+i)}) ${o}`;b.disabled=getMeuIndice()!==s.jogadorAtual;b.onclick=()=>sendAction('answerQuestion',{index:i});opcoesPergunta.appendChild(b)}); modalPergunta.classList.add('aberta');
     } else if(s.phase==='desafio'){
       textoDesafio.textContent=s.modal.pergunta; efeitoDesafio.textContent=`🎯 ${s.modal.tema} • Acerte: +${s.modal.recompensa} pontos | Erre: -${s.modal.penalidade} pontos e recue ${s.modal.recuo} casas.`; opcoesDesafio.innerHTML=''; s.modal.opcoes.forEach((o,i)=>{const b=document.createElement('button');b.className='opcao-desafio';b.textContent=`${String.fromCharCode(65+i)}) ${o}`;b.disabled=me?.index!==s.jogadorAtual;b.onclick=()=>sendAction('answerChallenge',{index:i});opcoesDesafio.appendChild(b)}); modalDesafio.classList.add('aberta');
     } else if(s.phase==='carta'){
-      textoCarta.textContent=s.modal.nome; efeitoCarta.textContent=s.modal.efeito; btnUsarCarta.disabled=me?.index!==s.jogadorAtual; btnUsarCarta.onclick=()=>sendAction('useCard'); modalCarta.classList.add('aberta');
+      textoCarta.textContent=s.modal.nome; efeitoCarta.textContent=s.modal.efeito;btnUsarCarta.disabled=getMeuIndice()!==s.jogadorAtual; btnUsarCarta.onclick=()=>sendAction('useCard'); modalCarta.classList.add('aberta');
     } else if(s.phase==='caos'){
-      textoCaos.textContent=s.modal.nome; efeitoCaos.textContent=s.modal.efeito; btnConcluirCaos.disabled=me?.index!==s.jogadorAtual; btnConcluirCaos.onclick=()=>sendAction('concludeChaos'); modalCaos.classList.add('aberta');
+      textoCaos.textContent=s.modal.nome; efeitoCaos.textContent=s.modal.efeito;btnConcluirCaos.disabled=getMeuIndice()!==s.jogadorAtual ; 1 btnConcluirCaos.onclick=()=>sendAction('concludeChaos'); modalCaos.classList.add('aberta');
     }
   }
+    function getMeuIndice() {
+    if (!room || !room.players) return -1;
+    return room.players.findIndex(p => p.id === socket.id);
+}
   function sendAction(type,payload={}){ socket.emit('playerAction',{type,...payload}); }
 
   // Controle de turno para TODOS os jogadores, inclusive o HOST.
@@ -177,12 +181,13 @@ document.addEventListener('click', e => {
     // Controle do botão de dado
     if (e.target.closest('#btnDado')) {
 
-        // NÃO é a vez deste jogador
-        if (!me || Number(me.index) !== Number(jogadorAtual)) {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            return;
-        }
+      // NÃO é a vez deste jogador
+if (getMeuIndice() !== Number(jogadorAtual)) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+    return;
+} 
+        
 
         // É a vez de um convidado
         if (!isHost) {

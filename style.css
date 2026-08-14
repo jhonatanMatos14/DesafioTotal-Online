@@ -385,22 +385,26 @@ html,body{background:radial-gradient(circle at 50% 35%,#102d43 0,#050b13 48%,#02
 
 /* Casas com volume/extrusão */
 .casa{
-  transform-style:preserve-3d;
-  transition:transform .18s ease,filter .18s ease,box-shadow .18s ease;
-  box-shadow:
-    0 5px 0 #05080d,
-    0 8px 0 #111d29,
-    0 12px 18px #000b,
-    inset 0 1px 0 #fff9;
+    position:relative;
+    transform-style:preserve-3d;
+    transition:
+        transform .18s cubic-bezier(.2,.8,.2,1),
+        filter .18s ease,
+        box-shadow .18s ease;
+
+    border-radius:18px;
+
+    box-shadow:
+        0 4px 0 #071018,
+        0 8px 0 #0d1b27,
+        0 12px 20px rgba(0,0,0,.45),
+        inset 0 1px 0 rgba(255,255,255,.65),
+        inset 0 -4px 8px rgba(0,0,0,.18);
+
+    overflow:visible;
 }
 
-.casa::after{
-  content:"";
-  position:absolute;
-  z-index:-1;
-  left:3px;right:-3px;top:4px;bottom:-7px;
-  border-radius:inherit;
-  background:linear-gradient(180deg,#1c2b38,#050b11);
+
   box-shadow:0 5px 10px #000b;
   transform:translateZ(-8px);
   pointer-events:none;

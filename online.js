@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", () => {
+(() => {
   const socket = io();
   const overlay = document.getElementById('onlineOverlay');
   const status = document.getElementById('onlineStatus');
@@ -50,7 +50,7 @@ document.addEventListener("DOMContentLoaded", () => {
     } else {
       jogadores = data.players.map(p=>({nome:p.name,cor:p.color,posicao:1,pontos:0,escudo:false}));
       jogadorAtual=0; partidaTerminou=false; historico=[];
-      prepararBaralhos(); sortearCasasEspeciais(); criarTabuleiro(); atualizarPlacar(); atualizarJogador(); renderHistorico(); mostrarTela(telaTabuleiro); btnDado.disabled=true;
+      prepararBaralhos(); sortearCasasEspeciais(); criarTabuleiro(); atualizarPlacar(); atualizarJogador(); renderHistorico(); mostrarTela(telaTabuleiro); btnDado.disabled = !(me && Number(me.index) === Number(jogadorAtual));
     }
   });
 
@@ -58,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
   window.onlineStartAsHost = function(players){
     jogadores=players.map(p=>({nome:p.name,cor:p.color,posicao:1,pontos:0,escudo:false,onlineId:p.id}));
     jogadorAtual=0; partidaTerminou=false; perguntaAtual=null; desafioAtual=null; jogadorDoDesafio=null; historico=[];
-    prepararBaralhos(); sortearCasasEspeciais(); dado.textContent='🎲'; btnDado.disabled=false; renderHistorico(); criarTabuleiro(); atualizarPlacar(); atualizarJogador(); mensagemJogo.textContent='Partida online iniciada!'; mostrarTela(telaTabuleiro);
+    prepararBaralhos(); sortearCasasEspeciais(); dado.textContent='🎲'; btnDado.disabled = !(me && me.index === jogadorAtual); renderHistorico(); criarTabuleiro(); atualizarPlacar(); atualizarJogador(); mensagemJogo.textContent='Partida online iniciada!'; mostrarTela(telaTabuleiro);
   };
 
   function setSet(target, values){ target.clear(); values.forEach(v=>target.add(v)); }
@@ -81,7 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
     setSet(CASAS_PERGUNTA,s.sets.pergunta); setSet(CASAS_DESAFIO,s.sets.desafio); setSet(CASAS_CARTA,s.sets.carta); setSet(CASAS_BONUS,s.sets.bonus); setSet(CASAS_PENALIDADE,s.sets.penalidade); setSet(CASAS_CAO,s.sets.caos);
     dado.textContent=s.dado||'🎲'; mensagemJogo.textContent=s.mensagem||''; criarTabuleiro(); atualizarTodasAsPecas(); atualizarPlacar(); atualizarJogador(); renderHistorico();
     renderModalRemote(s);
-    btnDado.disabled=true;
+    btnDado.disabled = !(me && Number(me.index) === Number(jogadorAtual));
   }
   socket.on('stateUpdate',renderRemote);
 
@@ -125,4 +125,4 @@ document.addEventListener("DOMContentLoaded", () => {
   // Host answer buttons should stay local. Guests need to know when it is their turn.
   nameInput?.addEventListener('keydown',e=>{if(e.key==='Enter')createBtn.click()});
   roomInput?.addEventListener('keydown',e=>{if(e.key==='Enter')joinBtn.click()});
-});
+})();

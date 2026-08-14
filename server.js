@@ -1,4 +1,5 @@
 const path = require('path');
+const fs = require('fs');
 const http = require('http');
 const express = require('express');
 const { Server } = require('socket.io');
@@ -11,6 +12,19 @@ const io = new Server(server, {
 });
 
 const ROOT = __dirname;
+
+// Carrega o jogo normalmente, mas injeta os novos recursos no HTML.
+app.get('/', (_req, res) => {
+  try {
+    let html = fs.readFileSync(path.join(ROOT, 'index.html'), 'utf8');
+    const tag = '<script src="extras.js"></script>';
+    if (!html.includes(tag)) html = html.replace('</body>', `${tag}\n</body>`);
+    res.type('html').send(html);
+  } catch (error) {
+    res.status(500).send('Erro ao carregar o jogo.');
+  }
+});
+
 app.use(express.static(ROOT));
 
 const rooms = new Map();
@@ -131,6 +145,13 @@ io.on('connection', socket => {
       playerId: socket.id,
       playerIndex
     });
+  });
+
+  socket.on('partyEmote', ({ emoji } = {}) => {
+    const room = getRoom(socket);
+    const allowed = new Set(['😂','😱','🔥','👍','😡','🎉']);
+    if (!room || !allowed.has(emoji)) return;
+    io.to(room.code).emit('partyEmote', { emoji, playerId: socket.id });
   });
 
   socket.on('publishState', state => {

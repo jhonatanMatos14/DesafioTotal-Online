@@ -60,15 +60,17 @@ socket.on('playerAction', action => {
 
     if (!action || typeof action.type !== 'string') return;
 
-    // Only the current player can roll the dice.
-    if (action.type === 'rolar') {
-        const currentPlayer = room.state?.jogadorAtual;
+  // Somente o jogador da vez pode enviar qualquer ação.
+const currentPlayer = room.state?.jogadorAtual;
 
-        if (currentPlayer === undefined || currentPlayer !== socket.data.index) {
-            socket.emit('errorMessage', 'Não é a sua vez de jogar!');
-            return;
-        }
-    }
+if (
+    currentPlayer === undefined ||
+    currentPlayer === null ||
+    Number(currentPlayer) !== Number(socket.data.index)
+) {
+    socket.emit('errorMessage', 'Não é a sua vez de jogar!');
+    return;
+}
 
     io.to(room.hostId).emit('remoteAction', {
         ...action,

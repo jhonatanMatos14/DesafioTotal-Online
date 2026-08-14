@@ -930,3 +930,82 @@ html,body{background:radial-gradient(circle at 50% 35%,#102d43 0,#050b13 48%,#02
         border-radius: 15px;
     }
 }
+/* ==================================================
+   AJUSTE FINAL - BOTÃO JOGAR DADO
+   ================================================== */
+
+.rodape-jogo.jogar-dado,
+.rodape-jogo .jogar-dado,
+button.jogar-dado,
+#btnDado {
+    position: fixed !important;
+
+    /* posição: lado direito, no meio da tela */
+    right: 300px !important;
+    top: 50% !important;
+    bottom: auto !important;
+    left: auto !important;
+
+    transform: translateY(-50%) !important;
+
+    z-index: 99999 !important;
+
+    /* tamanho menor */
+    width: 180px !important;
+    min-width: 180px !important;
+    max-width: 180px !important;
+
+    height: 52px !important;
+    min-height: 52px !important;
+
+    padding: 8px 12px !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    font-size: 16px !important;
+    font-weight: 900 !important;
+
+    border-radius: 14px !important;
+
+    cursor: pointer !important;
+
+    box-sizing: border-box !important;
+}
+
+
+/* efeito quando passar o mouse */
+
+.rodape-jogo.jogar-dado:hover,
+.rodape-jogo .jogar-dado:hover,
+button.jogar-dado:hover,
+#btnDado:hover {
+    transform: translateY(-50%) scale(1.04) !important;
+}
+
+
+/* ==================================================
+   NOTEBOOK / TELA MENOR
+   ================================================== */
+
+@media (max-width: 1200px) {
+
+    .rodape-jogo.jogar-dado,
+    .rodape-jogo .jogar-dado,
+    button.jogar-dado,
+    #btnDado {
+        right: 30px !important;
+        top: auto !important;
+        bottom: 25px !important;
+
+        transform: none !important;
+    }
+
+    .rodape-jogo.jogar-dado:hover,
+    .rodape-jogo .jogar-dado:hover,
+    button.jogar-dado:hover,
+    #btnDado:hover {
+        transform: scale(1.04) !important;
+    }
+}

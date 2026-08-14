@@ -1,17 +1,17 @@
-  document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", () => {
   const socket = io();
-  const overlay = document.getElementById('onlineOverlay');
-  const status = document.getElementById('onlineStatus');
-  const join = document.getElementById('onlineJoin');
-  const roomView = document.getElementById('onlineRoomView');
-  const nameInput = document.getElementById('onlineName');
-  const roomInput = document.getElementById('onlineRoom');
-  const playersEl = document.getElementById('onlinePlayers');
-  const codeEl = document.getElementById('onlineRoomCode');
-  const startBtn = document.getElementById('btnIniciarOnline');
-  const createBtn = document.getElementById('btnCriarSala');
-  const joinBtn = document.getElementById('btnEntrarSala');
-  const leaveBtn = document.getElementById('btnSairSala');
+  const overlay = document.getElementById("onlineOverlay");
+  const status = document.getElementById("onlineStatus");
+  const join = document.getElementById("onlineJoin");
+  const roomView = document.getElementById("onlineRoomView");
+  const nameInput = document.getElementById("onlineName");
+  const roomInput = document.getElementById("onlineRoom");
+  const playersEl = document.getElementById("onlinePlayers");
+  const codeEl = document.getElementById("onlineRoomCode");
+  const startBtn = document.getElementById("btnIniciarOnline");
+  const createBtn = document.getElementById("btnCriarSala");
+  const joinBtn = document.getElementById("btnEntrarSala");
+  const leaveBtn = document.getElementById("btnSairSala");
 
   let room = null;
   let me = null;
@@ -19,213 +19,350 @@
   let started = false;
   let lastState = null;
 
-  function setStatus(t, error=false){ status.textContent=t; status.style.color=error?'#ff6b6b':''; }
-  function showRoom(info){
-    room=info; me=info.players.find(p=>p.id===socket.id)||me; isHost=info.hostId===socket.id;
-    join.hidden=true; roomView.hidden=false; codeEl.textContent=info.code;
-    playersEl.innerHTML=info.players.map((p,i)=>`<div class="online-player ${p.id===info.hostId?'ready':''}"><strong>${i+1}. ${escapeHtml(p.name)}</strong><small>${p.id===info.hostId?'👑 HOST':'🎮 JOGADOR'} ${p.id===socket.id?'• VOCÊ':''}</small></div>`).join('');
-    startBtn.hidden=!isHost; startBtn.disabled=info.players.length<2 || info.started;
-    setStatus(info.started?'Partida em andamento.':'Sala pronta. Aguarde os jogadores.');
+  function setStatus(text, error = false) {
+    if (!status) return;
+    status.textContent = text;
+    status.style.color = error ? "#ff6b6b" : "";
   }
-  function escapeHtml(s){return String(s).replace(/[&<>'"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[c]));}
 
-  createBtn.onclick=()=>{ const name=nameInput.value.trim()||'Jogador 1'; socket.emit('createRoom',{name}); };
-  joinBtn.onclick=()=>{ const name=nameInput.value.trim()||'Jogador'; const code=roomInput.value.trim().toUpperCase(); if(code.length!==5) return setStatus('Digite o código de 5 caracteres.',true); socket.emit('joinRoom',{name,roomCode:code}); };
-  startBtn.onclick=()=>socket.emit('startGame');
-  leaveBtn.onclick=()=>{ location.reload(); };
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>\"']/g, char => ({
+      "&": "&amp;", "<": "&lt;", ">": "&gt;", "\"": "&quot;", "'": "&#39;"
+    }[char]));
+  }
 
-  socket.on('connect',()=>setStatus('Conectado. Crie uma sala ou entre em uma.'));
-  socket.on('connect_error',()=>setStatus('Não foi possível conectar ao servidor.',true));
-  socket.on('errorMessage',msg=>setStatus(msg,true));
-  socket.on('roomCreated',showRoom); socket.on('roomJoined',showRoom); socket.on('roomUpdate',showRoom);
-  socket.on('hostDisconnected',()=>{ alert('O host saiu. A sala foi encerrada.'); location.reload(); });
+  function getMeuIndice() {
+    if (!room || !Array.isArray(room.players)) return -1;
+    return room.players.findIndex(player => player.id === socket.id);
+  }
 
-  socket.on('gameStarted', data=>{
-    started=true;
-    me=data.players.find(p=>p.id===socket.id)||me;
-    room={...(room||{}),started:true,players:data.players};
-    overlay.style.display='none';
-    if(isHost){
-      onlineStartAsHost(data.players);
-    } else {
-      jogadores = data.players.map(p=>({nome:p.name,cor:p.color,posicao:1,pontos:0,escudo:false}));
-      jogadorAtual=0; partidaTerminou=false; historico=[];
-      prepararBaralhos(); sortearCasasEspeciais(); criarTabuleiro(); atualizarPlacar(); atualizarJogador(); renderHistorico(); mostrarTela(telaTabuleiro); btnDado.disabled = !(me && Number(me.index) === Number(jogadorAtual));
-    }
-  });
+  function showRoom(info) {
+    room = info;
+    me = info.players.find(player => player.id === socket.id) || me;
+    isHost = info.hostId === socket.id;
+    join.hidden = true;
+    roomView.hidden = false;
+    codeEl.textContent = info.code;
+    playersEl.innerHTML = info.players.map((player, index) => `
+      <div class="online-player ${player.id === info.hostId ? "ready" : ""}">
+        <strong>${index + 1}. ${escapeHtml(player.name)}</strong>
+        <small>${player.id === info.hostId ? "👑 HOST" : "🎮 JOGADOR"}${player.id === socket.id ? " • VOCÊ" : ""}</small>
+      </div>
+    `).join("");
+    startBtn.hidden = !isHost;
+    startBtn.disabled = info.players.length < 2 || info.started;
+    setStatus(info.started ? "Partida em andamento." : "Sala pronta. Aguarde os jogadores.");
+  }
 
-  // HOST: initialize the existing game engine with the players from the room.
-  window.onlineStartAsHost = function(players){
-    jogadores=players.map(p=>({nome:p.name,cor:p.color,posicao:1,pontos:0,escudo:false,onlineId:p.id}));
-    jogadorAtual=0; partidaTerminou=false; perguntaAtual=null; desafioAtual=null; jogadorDoDesafio=null; historico=[];
-    prepararBaralhos(); sortearCasasEspeciais(); dado.textContent='🎲'; btnDado.disabled = !(me && me.index === jogadorAtual); renderHistorico(); criarTabuleiro(); atualizarPlacar(); atualizarJogador(); mensagemJogo.textContent='Partida online iniciada!'; mostrarTela(telaTabuleiro);
+  createBtn.onclick = () => {
+    const name = nameInput.value.trim() || "Jogador 1";
+    createBtn.disabled = true;
+    socket.emit("createRoom", { name });
   };
 
-  function setSet(target, values){ target.clear(); values.forEach(v=>target.add(v)); }
-  function snapshot(){
-    const phase = document.getElementById('modalPergunta').classList.contains('aberta')?'pergunta':document.getElementById('modalDesafio').classList.contains('aberta')?'desafio':document.getElementById('modalCarta').classList.contains('aberta')?'carta':document.getElementById('modalCaos').classList.contains('aberta')?'caos':null;
-    let modal=null;
-    if(phase==='pergunta' && perguntaAtual) modal={tema:perguntaAtual.tema,pergunta:perguntaAtual.pergunta,opcoes:perguntaAtual.opcoes,correta:perguntaAtual.correta,dificuldade:perguntaAtual.dificuldade};
-    if(phase==='desafio' && desafioAtual) modal={tema:desafioAtual.tema,pergunta:desafioAtual.pergunta,opcoes:desafioAtual.opcoes,correta:desafioAtual.correta,recompensa:desafioAtual.recompensa,penalidade:desafioAtual.penalidade,recuo:desafioAtual.recuo};
-    if(phase==='carta'){ const j=jogadores[jogadorAtual]; const c=j?.cartaAtual; if(c) modal={nome:c.nome,efeito:c.efeito,cor:c.cor,tipo:c.tipo}; }
-    if(phase==='caos'){ const j=jogadores[jogadorAtual]; const e=j?.eventoCaosAtual; if(e) modal={nome:e.nome,efeito:e.efeito,tipo:e.tipo}; }
-    const sets={pergunta:[...CASAS_PERGUNTA],desafio:[...CASAS_DESAFIO],carta:[...CASAS_CARTA],bonus:[...CASAS_BONUS],penalidade:[...CASAS_PENALIDADE],caos:[...CASAS_CAO]};
-  return {
-    jogadores: jogadores.map(j => ({
-        nome: j.nome,
-        cor: j.cor,
-        posicao: j.posicao,
-        posicaoVisual: j.posicao,
-        pontos: j.pontos,
-        escudo: !!j.escudo
-    })),
-    jogadorAtual,
-    partidaTerminou,
-    historico: [...historico],
-    dado: dado.textContent,
-    mensagem: mensagemJogo.textContent,
-    sets,
-    phase,
-    modal
-};
-  }
-  function publish(){ if(isHost && started) socket.emit('publishState',snapshot()); }
-  setInterval(publish,120);
-function renderRemote(s){
-    if(!s) return;
+  joinBtn.onclick = () => {
+    const name = nameInput.value.trim() || "Jogador";
+    const code = roomInput.value.trim().toUpperCase();
+    if (code.length !== 5) return setStatus("Digite o código de 5 caracteres.", true);
+    joinBtn.disabled = true;
+    socket.emit("joinRoom", { name, roomCode: code });
+  };
 
-    const dadoAnterior = lastState?.dado;
-    lastState = s;
-    const historicoAnterior = lastState?.historico?.length || 0;
+  startBtn.onclick = () => {
+    if (!isHost || !room || room.players.length < 2) return;
+    startBtn.disabled = true;
+    socket.emit("startGame");
+  };
 
-    lastState = s;
+  leaveBtn.onclick = () => location.reload();
 
-    jogadores = s.players.map(p=>({...p}));
-    jogadorAtual = s.jogadorAtual;
-    partidaTerminou = s.partidaTerminou;
-    historico = s.historico || [];
-
-    setSet(CASAS_PERGUNTA, s.sets.pergunta);
-    setSet(CASAS_DESAFIO, s.sets.desafio);
-    setSet(CASAS_CARTA, s.sets.carta);
-    setSet(CASAS_BONUS, s.sets.bonus);
-    setSet(CASAS_PENALIDADE, s.sets.penalidade);
-    setSet(CASAS_CAO, s.sets.caos);
-
-    dado.textContent = s.dado;
-
-    mensagemJogo.textContent = s.mensagem || '';
-
-    criarTabuleiro();
-    atualizarJogador();
-    renderHistorico();
-
-    renderModalRemote(s);
-
-    btnDado.disabled = !(me && Number(me.index) === Number(jogadorAtual));
-
-    /* ===== ANIMAÇÃO DO DADO PARA TODOS OS JOGADORES ===== */
-
-    const houveNovaRolagem =
-        dadoAnterior !== undefined &&
-        (
-            s.dado !== dadoAnterior ||
-            historico.length > historicoAnterior
-        );
-
-    if(houveNovaRolagem){
-
-        /* Remove a animação anterior */
-        dado.classList.remove('girando');
-
-        /* Força o navegador a reiniciar a animação */
-        void dado.offsetWidth;
-
-        /* Inicia a animação novamente */
-        dado.classList.add('girando');
-
-        /* Remove depois que terminar */
-        setTimeout(() => {
-            dado.classList.remove('girando');
-        }, 1700);
-    }
-}
-  socket.on('stateUpdate',renderRemote);
-
-  function renderModalRemote(s){
-    document.querySelectorAll('.modal-pergunta,.modal-desafio,.modal-carta,.modal-caos').forEach(m=>m.classList.remove('aberta'));
-    if(!s.phase||!s.modal) return;
-    if(s.phase==='pergunta'){
-      temaPergunta.textContent=`${s.modal.tema}${s.modal.dificuldade==='difícil'?' • 🧠 DIFÍCIL':''}`;
-      regraPergunta.textContent=`Acertou: +${s.modal.dificuldade==='difícil'?10:5} • Errou: -${s.modal.dificuldade==='difícil'?5:3} e -${s.modal.dificuldade==='difícil'?3:2} casas`;
-      textoPergunta.textContent=s.modal.pergunta; opcoesPergunta.innerHTML=''; s.modal.opcoes.forEach((o,i)=>{const b=document.createElement('button');b.className='opcao-pergunta';b.textContent=`${String.fromCharCode(65+i)}) ${o}`;b.disabled=getMeuIndice()!==s.jogadorAtual;b.onclick=()=>sendAction('answerQuestion',{index:i});opcoesPergunta.appendChild(b)}); modalPergunta.classList.add('aberta');
-    } else if(s.phase==='desafio'){
-      textoDesafio.textContent=s.modal.pergunta; efeitoDesafio.textContent=`🎯 ${s.modal.tema} • Acerte: +${s.modal.recompensa} pontos | Erre: -${s.modal.penalidade} pontos e recue ${s.modal.recuo} casas.`; opcoesDesafio.innerHTML=''; s.modal.opcoes.forEach((o,i)=>{const b=document.createElement('button');b.className='opcao-desafio';b.textContent=`${String.fromCharCode(65+i)}) ${o}`;b.disabled=me?.index!==s.jogadorAtual;b.onclick=()=>sendAction('answerChallenge',{index:i});opcoesDesafio.appendChild(b)}); modalDesafio.classList.add('aberta');
-    } else if(s.phase==='carta'){
-      textoCarta.textContent=s.modal.nome; efeitoCarta.textContent=s.modal.efeito;btnUsarCarta.disabled=getMeuIndice()!==s.jogadorAtual; btnUsarCarta.onclick=()=>sendAction('useCard'); modalCarta.classList.add('aberta');
-    } else if(s.phase==='caos'){
-      textoCaos.textContent=s.modal.nome; efeitoCaos.textContent=s.modal.efeito;btnConcluirCaos.disabled=getMeuIndice()!==s.jogadorAtual ; 1 btnConcluirCaos.onclick=()=>sendAction('concludeChaos'); modalCaos.classList.add('aberta');
-    }
-  }
-    function getMeuIndice() {
-    if (!room || !room.players) return -1;
-    return room.players.findIndex(p => p.id === socket.id);
-}
-  function sendAction(type,payload={}){ socket.emit('playerAction',{type,...payload}); }
-
-  // Controle de turno para TODOS os jogadores, inclusive o HOST.
-document.addEventListener('click', e => {
-
-    if (!started) return;
-
-    // Controle do botão de dado
-    if (e.target.closest('#btnDado')) {
-
-      // NÃO é a vez deste jogador
-if (getMeuIndice() !== Number(jogadorAtual)) {
-    e.preventDefault();
-    e.stopImmediatePropagation();
-    return;
-} 
-        
-
-        // É a vez de um convidado
-        if (!isHost) {
-            e.preventDefault();
-            e.stopImmediatePropagation();
-            sendAction('roll');
-            return;
-        }
-
-        // É a vez do HOST:
-        // deixa o jogo executar o jogarDado() normalmente.
-    }
-
-    // Bloqueia reiniciar/menu durante a partida
-    if (
-        e.target.closest('#btnReiniciar') ||
-        e.target.closest('#btnMenu')
-    ) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-    }
-
-}, true);
-
-  // Host executes commands from guests. The existing game functions remain the source of truth.
-  socket.on('remoteAction', action=>{
-    if(!isHost || !started) return;
-    const idx=Number(action.playerIndex);
-    if(idx!==jogadorAtual) return;
-    const j=jogadores[jogadorAtual];
-    if(action.type==='roll') return jogarDado();
-    if(action.type==='answerQuestion' && perguntaAtual) return responderPergunta(Number(action.index),j);
-    if(action.type==='answerChallenge' && desafioAtual) return responderDesafio(Number(action.index));
-    if(action.type==='useCard') return btnUsarCarta.click();
-    if(action.type==='concludeChaos') return btnConcluirCaos.click();
+  socket.on("connect", () => {
+    createBtn.disabled = false;
+    joinBtn.disabled = false;
+    setStatus("Conectado. Crie uma sala ou entre em uma.");
   });
 
-  // Host answer buttons should stay local. Guests need to know when it is their turn.
-  nameInput?.addEventListener('keydown',e=>{if(e.key==='Enter')createBtn.click()});
-  roomInput?.addEventListener('keydown',e=>{if(e.key==='Enter')joinBtn.click()});
+  socket.on("disconnect", () => setStatus("Conexão perdida. Tentando reconectar...", true));
+
+  socket.on("connect_error", () => {
+    createBtn.disabled = false;
+    joinBtn.disabled = false;
+    setStatus("Não foi possível conectar ao servidor.", true);
+  });
+
+  socket.on("errorMessage", message => {
+    createBtn.disabled = false;
+    joinBtn.disabled = false;
+    startBtn.disabled = false;
+    setStatus(message, true);
+  });
+
+  socket.on("roomCreated", showRoom);
+  socket.on("roomJoined", showRoom);
+  socket.on("roomUpdate", showRoom);
+
+  socket.on("hostDisconnected", () => {
+    alert("O host saiu. A sala foi encerrada.");
+    location.reload();
+  });
+
+  socket.on("gameStarted", data => {
+    started = true;
+    room = { ...(room || {}), started: true, players: data.players };
+    me = data.players.find(player => player.id === socket.id) || me;
+    isHost = room.hostId === socket.id;
+    overlay.style.display = "none";
+
+    if (isHost) {
+      onlineStartAsHost(data.players);
+      return;
+    }
+
+    jogadores = data.players.map(player => ({
+      nome: player.name, cor: player.color, posicao: 1, pontos: 0,
+      escudo: false, onlineId: player.id
+    }));
+    jogadorAtual = 0;
+    partidaTerminou = false;
+    historico = [];
+    prepararBaralhos();
+    sortearCasasEspeciais();
+    criarTabuleiro();
+    atualizarPlacar();
+    atualizarJogador();
+    renderHistorico();
+    mostrarTela(telaTabuleiro);
+    btnDado.disabled = true;
+  });
+
+  window.onlineStartAsHost = function(players) {
+    jogadores = players.map(player => ({
+      nome: player.name, cor: player.color, posicao: 1, pontos: 0,
+      escudo: false, onlineId: player.id
+    }));
+    jogadorAtual = 0;
+    partidaTerminou = false;
+    perguntaAtual = null;
+    desafioAtual = null;
+    jogadorDoDesafio = null;
+    historico = [];
+    prepararBaralhos();
+    sortearCasasEspeciais();
+    dado.textContent = "🎲";
+    btnDado.disabled = getMeuIndice() !== jogadorAtual;
+    renderHistorico();
+    criarTabuleiro();
+    atualizarPlacar();
+    atualizarJogador();
+    mensagemJogo.textContent = "Partida online iniciada!";
+    mostrarTela(telaTabuleiro);
+    setTimeout(publish, 50);
+  };
+
+  function setSet(target, values) {
+    target.clear();
+    (Array.isArray(values) ? values : []).forEach(value => target.add(Number(value)));
+  }
+
+  function snapshot() {
+    const phase = modalPergunta.classList.contains("aberta") ? "pergunta"
+      : modalDesafio.classList.contains("aberta") ? "desafio"
+      : modalCarta.classList.contains("aberta") ? "carta"
+      : modalCaos.classList.contains("aberta") ? "caos" : null;
+
+    let modal = null;
+    if (phase === "pergunta" && perguntaAtual) {
+      modal = { tema: perguntaAtual.tema, pergunta: perguntaAtual.pergunta, opcoes: perguntaAtual.opcoes,
+        correta: perguntaAtual.correta, dificuldade: perguntaAtual.dificuldade };
+    }
+    if (phase === "desafio" && desafioAtual) {
+      modal = { tema: desafioAtual.tema, pergunta: desafioAtual.pergunta, opcoes: desafioAtual.opcoes,
+        correta: desafioAtual.correta, recompensa: desafioAtual.recompensa,
+        penalidade: desafioAtual.penalidade, recuo: desafioAtual.recuo };
+    }
+    if (phase === "carta") {
+      const player = jogadores[jogadorAtual];
+      const card = player?.cartaAtual;
+      if (card) modal = { nome: card.nome, efeito: card.efeito, cor: card.cor, tipo: card.tipo };
+    }
+    if (phase === "caos") {
+      const player = jogadores[jogadorAtual];
+      const event = player?.eventoCaosAtual;
+      if (event) modal = { nome: event.nome, efeito: event.efeito, tipo: event.tipo };
+    }
+
+    return {
+      // Consistent schema: guests read state.players.
+      players: jogadores.map(player => ({
+        nome: player.nome, cor: player.cor, posicao: player.posicao,
+        posicaoVisual: player.posicao, pontos: player.pontos, escudo: !!player.escudo
+      })),
+      jogadorAtual,
+      partidaTerminou,
+      historico: [...historico],
+      dado: dado.textContent,
+      mensagem: mensagemJogo.textContent,
+      sets: {
+        pergunta: [...CASAS_PERGUNTA], desafio: [...CASAS_DESAFIO], carta: [...CASAS_CARTA],
+        bonus: [...CASAS_BONUS], penalidade: [...CASAS_PENALIDADE], caos: [...CASAS_CAO]
+      },
+      phase,
+      modal
+    };
+  }
+
+  function publish() {
+    if (isHost && started) socket.emit("publishState", snapshot());
+  }
+
+  setInterval(publish, 250);
+
+  function renderRemote(state) {
+    if (!state || !Array.isArray(state.players)) return;
+
+    const previousState = lastState;
+    const previousHistoryLength = previousState?.historico?.length || 0;
+    const previousDice = previousState?.dado;
+    lastState = state;
+
+    jogadores = state.players.map(player => ({ ...player }));
+    jogadorAtual = Number(state.jogadorAtual) || 0;
+    partidaTerminou = !!state.partidaTerminou;
+    historico = state.historico || [];
+
+    setSet(CASAS_PERGUNTA, state.sets?.pergunta);
+    setSet(CASAS_DESAFIO, state.sets?.desafio);
+    setSet(CASAS_CARTA, state.sets?.carta);
+    setSet(CASAS_BONUS, state.sets?.bonus);
+    setSet(CASAS_PENALIDADE, state.sets?.penalidade);
+    setSet(CASAS_CAO, state.sets?.caos);
+
+    dado.textContent = state.dado || "🎲";
+    mensagemJogo.textContent = state.mensagem || "";
+    criarTabuleiro();
+    atualizarJogador();
+    atualizarPlacar();
+    atualizarTodasAsPecas();
+    renderHistorico();
+    renderModalRemote(state);
+    btnDado.disabled = getMeuIndice() !== jogadorAtual || partidaTerminada;
+
+    const houveNovaRolagem = previousDice !== undefined &&
+      (state.dado !== previousDice || historico.length > previousHistoryLength);
+    if (houveNovaRolagem) {
+      dado.classList.remove("girando");
+      void dado.offsetWidth;
+      dado.classList.add("girando");
+      setTimeout(() => dado.classList.remove("girando"), 1700);
+    }
+  }
+
+  socket.on("stateUpdate", renderRemote);
+
+  function renderModalRemote(state) {
+    document.querySelectorAll(".modal-pergunta,.modal-desafio,.modal-carta,.modal-caos")
+      .forEach(modal => modal.classList.remove("aberta"));
+    if (!state.phase || !state.modal) return;
+
+    const isMyTurn = getMeuIndice() === Number(state.jogadorAtual);
+
+    if (state.phase === "pergunta") {
+      const difficult = state.modal.dificuldade === "difícil";
+      temaPergunta.textContent = `${state.modal.tema}${difficult ? " • 🧠 DIFÍCIL" : ""}`;
+      regraPergunta.textContent = `Acertou: +${difficult ? 10 : 5} • Errou: -${difficult ? 5 : 3} e -${difficult ? 3 : 2} casas`;
+      textoPergunta.textContent = state.modal.pergunta;
+      opcoesPergunta.innerHTML = "";
+      state.modal.opcoes.forEach((option, index) => {
+        const button = document.createElement("button");
+        button.className = "opcao-pergunta";
+        button.textContent = `${String.fromCharCode(65 + index)}) ${option}`;
+        button.disabled = !isMyTurn;
+        button.onclick = () => sendAction("answerQuestion", { index });
+        opcoesPergunta.appendChild(button);
+      });
+      modalPergunta.classList.add("aberta");
+      return;
+    }
+
+    if (state.phase === "desafio") {
+      textoDesafio.textContent = state.modal.pergunta;
+      efeitoDesafio.textContent = `🎯 ${state.modal.tema} • Acerte: +${state.modal.recompensa} pontos | Erre: -${state.modal.penalidade} pontos e recue ${state.modal.recuo} casas.`;
+      opcoesDesafio.innerHTML = "";
+      state.modal.opcoes.forEach((option, index) => {
+        const button = document.createElement("button");
+        button.className = "opcao-desafio";
+        button.textContent = `${String.fromCharCode(65 + index)}) ${option}`;
+        button.disabled = !isMyTurn;
+        button.onclick = () => sendAction("answerChallenge", { index });
+        opcoesDesafio.appendChild(button);
+      });
+      modalDesafio.classList.add("aberta");
+      return;
+    }
+
+    if (state.phase === "carta") {
+      textoCarta.textContent = state.modal.nome;
+      efeitoCarta.textContent = state.modal.efeito;
+      btnUsarCarta.disabled = !isMyTurn;
+      btnUsarCarta.onclick = () => sendAction("useCard");
+      modalCarta.classList.add("aberta");
+      return;
+    }
+
+    if (state.phase === "caos") {
+      textoCaos.textContent = state.modal.nome;
+      efeitoCaos.textContent = state.modal.efeito;
+      btnConcluirCaos.disabled = !isMyTurn;
+      btnConcluirCaos.onclick = () => sendAction("concludeChaos");
+      modalCaos.classList.add("aberta");
+    }
+  }
+
+  function sendAction(type, payload = {}) {
+    if (started) socket.emit("playerAction", { type, ...payload });
+  }
+
+  document.addEventListener("click", event => {
+    if (!started) return;
+
+    if (event.target.closest("#btnDado")) {
+      if (getMeuIndice() !== Number(jogadorAtual)) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        return;
+      }
+      if (!isHost) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        sendAction("roll");
+        return;
+      }
+    }
+
+    if (event.target.closest("#btnReiniciar") || event.target.closest("#btnMenu")) {
+      event.preventDefault();
+      event.stopImmediatePropagation();
+    }
+  }, true);
+
+  socket.on("remoteAction", action => {
+    if (!isHost || !started || !action) return;
+    const index = Number(action.playerIndex);
+    if (index !== Number(jogadorAtual)) return;
+    const player = jogadores[jogadorAtual];
+    if (!player) return;
+
+    if (action.type === "roll") return jogarDado();
+    if (action.type === "answerQuestion" && perguntaAtual) return responderPergunta(Number(action.index), player);
+    if (action.type === "answerChallenge" && desafioAtual) return responderDesafio(Number(action.index));
+    if (action.type === "useCard") return btnUsarCarta.click();
+    if (action.type === "concludeChaos") return btnConcluirCaos.click();
+  });
+
+  nameInput?.addEventListener("keydown", event => {
+    if (event.key === "Enter") createBtn.click();
+  });
+  roomInput?.addEventListener("keydown", event => {
+    if (event.key === "Enter") joinBtn.click();
+  });
 });

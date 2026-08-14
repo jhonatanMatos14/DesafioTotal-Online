@@ -70,10 +70,27 @@
     if(phase==='carta'){ const j=jogadores[jogadorAtual]; const c=j?.cartaAtual; if(c) modal={nome:c.nome,efeito:c.efeito,cor:c.cor,tipo:c.tipo}; }
     if(phase==='caos'){ const j=jogadores[jogadorAtual]; const e=j?.eventoCaosAtual; if(e) modal={nome:e.nome,efeito:e.efeito,tipo:e.tipo}; }
     const sets={pergunta:[...CASAS_PERGUNTA],desafio:[...CASAS_DESAFIO],carta:[...CASAS_CARTA],bonus:[...CASAS_BONUS],penalidade:[...CASAS_PENALIDADE],caos:[...CASAS_CAO]};
-    return {players:jogadores.map(j=>({nome:j.nome,cor:j.cor,posicao:j.posicao,pontos:j.pontos,escudo:!!j.escudo})),jogadorAtual,partidaTerminou,historico:[...historico],dado:dado.textContent,mensagem:mensagemJogo.textContent,sets,phase,modal};
+  return {
+    jogadores: jogadores.map(j => ({
+        nome: j.nome,
+        cor: j.cor,
+        posicao: j.posicao,
+        posicaoVisual: j.posicao,
+        pontos: j.pontos,
+        escudo: !!j.escudo
+    })),
+    jogadorAtual,
+    partidaTerminou,
+    historico: [...historico],
+    dado: dado.textContent,
+    mensagem: mensagemJogo.textContent,
+    sets,
+    phase,
+    modal
+};
   }
   function publish(){ if(isHost && started) socket.emit('publishState',snapshot()); }
-  setInterval(publish,350);
+  setInterval(publish,120);
 function renderRemote(s){
     if(!s) return;
 

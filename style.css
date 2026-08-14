@@ -1056,3 +1056,63 @@ button.jogar-dado,
     align-items: center !important;
     justify-content: center !important;
 }
+/* ===== BOTÃO DADO - DESIGN FINAL ===== */
+
+.area-tabuleiro {
+    position: relative !important;
+}
+
+.area-tabuleiro #btnDado {
+    position: absolute !important;
+
+    /* lado direito do campo */
+    right: 25px !important;
+    top: 50% !important;
+
+    left: auto !important;
+    bottom: auto !important;
+
+    transform: translateY(-50%) !important;
+
+    /* pequeno */
+    width: 105px !important;
+    min-width: 105px !important;
+    max-width: 105px !important;
+
+    height: 42px !important;
+    min-height: 42px !important;
+
+    padding: 4px 8px !important;
+    margin: 0 !important;
+
+    /* texto */
+    font-size: 13px !important;
+    font-weight: 900 !important;
+
+    border-radius: 12px !important;
+
+    z-index: 500 !important;
+
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+
+    /* visual */
+    background: linear-gradient(135deg, #19d86b, #08a957) !important;
+    border: 2px solid rgba(255,255,255,.45) !important;
+
+    box-shadow:
+        0 4px 12px rgba(0,0,0,.45),
+        0 0 12px rgba(25,216,107,.35) !important;
+
+    transition: .2s ease !important;
+}
+
+/* mouse em cima */
+.area-tabuleiro #btnDado:hover {
+    transform: translateY(-50%) scale(1.06) !important;
+
+    box-shadow:
+        0 6px 18px rgba(0,0,0,.55),
+        0 0 18px rgba(25,216,107,.55) !important;
+}

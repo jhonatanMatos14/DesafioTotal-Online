@@ -52,12 +52,30 @@ io.on('connection', socket => {
     room.started=true; io.to(room.code).emit('gameStarted',{players:roomInfo(room).players});
   });
 
-  // Guests send player actions to the host. The host remains authoritative.
-  socket.on('playerAction', action => {
-    const room=rooms.get(socket.data.room); if(!room || !room.started) return;
-    if(!action || typeof action.type!=='string') return;
-    io.to(room.hostId).emit('remoteAction',{...action,playerId:socket.id,playerIndex:socket.data.index});
-  });
+// Guests send player actions to the host.
+// Only the player whose turn it is can play.
+socket.on('playerAction', action => {
+    const room = rooms.get(socket.data.room);
+    if (!room || !room.started) return;
+
+    if (!action || typeof action.type !== 'string') return;
+
+    // Only the current player can roll the dice.
+    if (action.type === 'rolar') {
+        const currentPlayer = room.state?.jogadorAtual;
+
+        if (currentPlayer === undefined || currentPlayer !== socket.data.index) {
+            socket.emit('errorMessage', 'Não é a sua vez de jogar!');
+            return;
+        }
+    }
+
+    io.to(room.hostId).emit('remoteAction', {
+        ...action,
+        playerId: socket.id,
+        playerIndex: socket.data.index
+    });
+});
 
   // Only the host may publish the authoritative state.
   socket.on('publishState', state => {

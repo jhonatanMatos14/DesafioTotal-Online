@@ -1,24 +1,27 @@
-/* Desafio Total - movimento e interações robustas */
+/* Desafio Total - movimento e interações robustas e leves */
 (() => {
   const board = document.getElementById('tabuleiro');
   if (!board) return;
 
-  function animatePieces() {
-    board.querySelectorAll('.peca-jogador').forEach(piece => {
-      piece.classList.remove('mover');
-      void piece.offsetWidth;
-      piece.classList.add('mover');
-    });
+  function refreshBoardVisual() {
+    if (typeof window.dtRefreshBoardVisual === 'function') {
+      window.dtRefreshBoardVisual();
+    }
   }
-  const observer = new MutationObserver(() => animatePieces());
-  observer.observe(board, { childList: true, subtree: true });
 
   function atualizarVisual() {
     if (typeof atualizarPlacar === 'function') atualizarPlacar();
     if (typeof atualizarTodasAsPecas === 'function') atualizarTodasAsPecas();
+    refreshBoardVisual();
   }
-  function limite(pos) { return Math.max(1, Math.min(TOTAL_CASAS, Number(pos) || 1)); }
-  function jogadorDaVezAtual() { return Array.isArray(jogadores) ? jogadores[jogadorAtual] : null; }
+
+  function limite(pos) {
+    return Math.max(1, Math.min(TOTAL_CASAS, Number(pos) || 1));
+  }
+
+  function jogadorDaVezAtual() {
+    return Array.isArray(jogadores) ? jogadores[jogadorAtual] : null;
+  }
 
   function onlineNaoHost() {
     const overlay = document.getElementById('onlineOverlay');
@@ -27,10 +30,15 @@
   }
 
   function moverComAnimacao(jogador, inicio, fim, depois) {
-    inicio = limite(inicio); fim = limite(fim);
+    inicio = limite(inicio);
+    fim = limite(fim);
     jogador.posicao = fim;
-    atualizarVisual();
-    if (inicio === fim) return depois?.();
+
+    if (inicio === fim) {
+      atualizarVisual();
+      depois?.();
+      return;
+    }
 
     let p = inicio;
     const passo = inicio < fim ? 1 : -1;
@@ -38,6 +46,8 @@
       p += passo;
       jogador.posicaoVisual = p;
       if (typeof atualizarTodasAsPecas === 'function') atualizarTodasAsPecas();
+      refreshBoardVisual();
+
       if (p === fim) {
         clearInterval(id);
         jogador.posicaoVisual = undefined;
@@ -47,11 +57,13 @@
     }, 90);
   }
 
+  // Evita múltiplas versões de passarVez rodando ao mesmo tempo.
   passarVez = function() {
     if (!Array.isArray(jogadores) || !jogadores.length || partidaTerminou) return;
     jogadorAtual = (jogadorAtual + 1) % jogadores.length;
     atualizarJogador();
     atualizarPlacar();
+    refreshBoardVisual();
     if (typeof btnDado !== 'undefined') btnDado.disabled = false;
     if (typeof mensagemJogo !== 'undefined' && jogadores[jogadorAtual]) {
       mensagemJogo.textContent += ` Agora é a vez de ${jogadores[jogadorAtual].nome}.`;
@@ -63,9 +75,11 @@
     event.preventDefault();
     event.stopImmediatePropagation();
     if (window.__dtCardBusy) return;
+
     const jogador = jogadorDaVezAtual();
     const carta = jogador?.cartaAtual;
     if (!jogador || !carta) return;
+
     window.__dtCardBusy = true;
     btnUsarCarta.disabled = true;
 
@@ -87,7 +101,7 @@
     } else if (carta.tipo === 'troca') {
       const adversarios = jogadores.filter((_, i) => i !== jogadorAtual);
       if (adversarios.length) {
-        const alvo = [...adversarios].sort((a,b) =>
+        const alvo = [...adversarios].sort((a, b) =>
           Math.abs(a.posicao - jogador.posicao) - Math.abs(b.posicao - jogador.posicao)
         )[0];
         const posJogador = limite(jogador.posicao);
@@ -103,6 +117,7 @@
 
     const depois = limite(jogador.posicao);
     jogador.posicao = depois;
+
     const finalizarCarta = () => {
       if (jogador.cartaAtual === carta) jogador.cartaAtual = null;
       modalCarta.classList.remove('aberta');
@@ -118,12 +133,16 @@
       } else {
         setTimeout(() => passarVez(), 300);
       }
+
       window.__dtCardBusy = false;
       if (!partidaTerminou && !novamente) btnUsarCarta.disabled = false;
     };
 
     if (antes !== depois) moverComAnimacao(jogador, antes, depois, finalizarCarta);
-    else { atualizarVisual(); finalizarCarta(); }
+    else {
+      atualizarVisual();
+      finalizarCarta();
+    }
   }, true);
 
   btnConcluirCaos.addEventListener('click', event => {
@@ -131,9 +150,11 @@
     event.preventDefault();
     event.stopImmediatePropagation();
     if (window.__dtChaosBusy) return;
+
     const jogador = jogadorDaVezAtual();
     const evento = jogador?.eventoCaosAtual;
     if (!jogador || !evento) return;
+
     window.__dtChaosBusy = true;
     btnConcluirCaos.disabled = true;
 
@@ -147,6 +168,7 @@
       modalCaos.classList.remove('aberta');
       atualizarVisual();
       registrarAcao(jogador, `ativou ${evento.nome.replace(/^[^A-ZÀ-ÿ0-9]+/, '')}`);
+
       if (jogador.posicao >= TOTAL_CASAS) {
         jogador.posicao = TOTAL_CASAS;
         finalizarPartida(jogador);
@@ -160,7 +182,10 @@
     };
 
     if (antes !== depois) moverComAnimacao(jogador, antes, depois, finalizar);
-    else { atualizarVisual(); finalizar(); }
+    else {
+      atualizarVisual();
+      finalizar();
+    }
   }, true);
 
   const responderPerguntaAnterior = responderPergunta;
@@ -201,12 +226,11 @@
   };
 
   document.addEventListener('click', e => {
-    if (e.target.closest('#btnDado')) setTimeout(animatePieces, 120);
+    if (e.target.closest('#btnDado')) setTimeout(refreshBoardVisual, 100);
   });
 
-  // Mantém o indicador visual final do tabuleiro já usado no projeto.
   const visual = document.createElement('script');
-  visual.src = 'board-final.js?v=3';
+  visual.src = 'board-final.js?v=4';
   visual.defer = true;
   document.head.appendChild(visual);
 })();

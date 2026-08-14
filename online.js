@@ -15,6 +15,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   let room = null;
   let me = null;
+  let myIndex = -1;
   let isHost = false;
   let started = false;
   let lastState = null;
@@ -31,13 +32,30 @@ document.addEventListener("DOMContentLoaded", () => {
     }[char]));
   }
 
+  // Guarda o índice do jogador no momento em que ele entra na sala.
+  // Isso evita depender de socket.id depois que a partida começou.
+  function atualizarMeuIndice(players) {
+    if (!Array.isArray(players)) return;
+    const found = players.findIndex(player => player.id === socket.id);
+    if (found >= 0) myIndex = found;
+    else if (me && Number.isInteger(Number(me.index))) myIndex = Number(me.index);
+  }
+
   function getMeuIndice() {
+    if (myIndex >= 0) return myIndex;
     if (!room || !Array.isArray(room.players)) return -1;
-    return room.players.findIndex(player => player.id === socket.id);
+    myIndex = room.players.findIndex(player => player.id === socket.id);
+    return myIndex;
+  }
+
+  function atualizarBotaoDado() {
+    if (!btnDado) return;
+    btnDado.disabled = !started || partidaTerminou || getMeuIndice() !== Number(jogadorAtual);
   }
 
   function showRoom(info) {
     room = info;
+    atualizarMeuIndice(info.players);
     me = info.players.find(player => player.id === socket.id) || me;
     isHost = info.hostId === socket.id;
     join.hidden = true;
@@ -109,6 +127,7 @@ document.addEventListener("DOMContentLoaded", () => {
   socket.on("gameStarted", data => {
     started = true;
     room = { ...(room || {}), started: true, players: data.players };
+    atualizarMeuIndice(data.players);
     me = data.players.find(player => player.id === socket.id) || me;
     isHost = room.hostId === socket.id;
     overlay.style.display = "none";
@@ -120,7 +139,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     jogadores = data.players.map(player => ({
       nome: player.name, cor: player.color, posicao: 1, pontos: 0,
-      escudo: false, onlineId: player.id
+      escudo: false, onlineId: player.id, index: player.index
     }));
     jogadorAtual = 0;
     partidaTerminou = false;
@@ -132,13 +151,13 @@ document.addEventListener("DOMContentLoaded", () => {
     atualizarJogador();
     renderHistorico();
     mostrarTela(telaTabuleiro);
-    btnDado.disabled = true;
+    atualizarBotaoDado();
   });
 
   window.onlineStartAsHost = function(players) {
     jogadores = players.map(player => ({
       nome: player.name, cor: player.color, posicao: 1, pontos: 0,
-      escudo: false, onlineId: player.id
+      escudo: false, onlineId: player.id, index: player.index
     }));
     jogadorAtual = 0;
     partidaTerminou = false;
@@ -149,7 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
     prepararBaralhos();
     sortearCasasEspeciais();
     dado.textContent = "🎲";
-    btnDado.disabled = getMeuIndice() !== jogadorAtual;
+    atualizarBotaoDado();
     renderHistorico();
     criarTabuleiro();
     atualizarPlacar();
@@ -192,8 +211,9 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     return {
-      // Consistent schema: guests read state.players.
       players: jogadores.map(player => ({
+        id: player.onlineId,
+        index: player.index,
         nome: player.nome, cor: player.cor, posicao: player.posicao,
         posicaoVisual: player.posicao, pontos: player.pontos, escudo: !!player.escudo
       })),
@@ -225,7 +245,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const previousDice = previousState?.dado;
     lastState = state;
 
-    jogadores = state.players.map(player => ({ ...player }));
+    jogadores = state.players.map(player => ({ ...player, onlineId: player.id, index: player.index }));
     jogadorAtual = Number(state.jogadorAtual) || 0;
     partidaTerminou = !!state.partidaTerminou;
     historico = state.historico || [];
@@ -245,7 +265,7 @@ document.addEventListener("DOMContentLoaded", () => {
     atualizarTodasAsPecas();
     renderHistorico();
     renderModalRemote(state);
-    btnDado.disabled = getMeuIndice() !== jogadorAtual || partidaTerminada;
+    atualizarBotaoDado();
 
     const houveNovaRolagem = previousDice !== undefined &&
       (state.dado !== previousDice || historico.length > previousHistoryLength);

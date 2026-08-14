@@ -1,0 +1,14 @@
+/* ===== Desafio Total - tabuleiro maior ===== */
+.tela-tabuleiro{padding:10px 12px}
+.layout-jogo{width:min(2200px,100%);grid-template-columns:230px minmax(900px,1fr) 240px;gap:14px}
+.area-tabuleiro{min-width:0}
+.tabuleiro{width:100%;aspect-ratio:1.58/1;min-height:820px;padding:34px;gap:11px;border-width:10px;border-radius:34px}
+.tabuleiro:before{width:320px;height:145px;font-size:32px}
+.tabuleiro:after{font-size:25px;letter-spacing:9px}
+.casa{font-size:clamp(16px,1.25vw,25px);border-width:3px;border-radius:15px}
+.peca-jogador{width:36px;height:36px;font-size:11px;border-width:3px}
+.rodape-jogo{width:min(1250px,100%);margin-top:12px}
+@media(min-width:1700px){.tabuleiro{min-height:900px}.casa{font-size:25px}.peca-jogador{width:40px;height:40px;font-size:12px}}
+@media(max-width:1450px){.layout-jogo{grid-template-columns:210px minmax(820px,1fr) 220px}.tabuleiro{min-height:760px}}
+@media(max-width:1100px){.layout-jogo{grid-template-columns:1fr}.lateral-esquerdo,.lateral-direito{display:grid;grid-template-columns:repeat(2,1fr)}.tabuleiro{min-height:700px}}
+@media(max-width:700px){.tabuleiro{min-height:560px;padding:20px;gap:7px;border-width:7px}.tabuleiro:before{width:210px;height:90px;font-size:21px}.tabuleiro:after{font-size:15px;letter-spacing:4px}.casa{font-size:13px}.peca-jogador{width:30px;height:30px}}

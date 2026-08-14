@@ -1,4 +1,4 @@
-(() => {
+  document.addEventListener("DOMContentLoaded", () => {
   const socket = io();
   const overlay = document.getElementById('onlineOverlay');
   const status = document.getElementById('onlineStatus');
@@ -125,4 +125,4 @@
   // Host answer buttons should stay local. Guests need to know when it is their turn.
   nameInput?.addEventListener('keydown',e=>{if(e.key==='Enter')createBtn.click()});
   roomInput?.addEventListener('keydown',e=>{if(e.key==='Enter')joinBtn.click()});
-})();
+});

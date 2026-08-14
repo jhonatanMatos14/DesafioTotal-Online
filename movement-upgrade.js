@@ -16,4 +16,9 @@
   document.addEventListener('click', e => {
     if (e.target.closest('#btnDado')) setTimeout(animatePieces, 100);
   });
+
+  const visual = document.createElement('script');
+  visual.src = 'board-final.js?v=2';
+  visual.defer = true;
+  document.head.appendChild(visual);
 })();

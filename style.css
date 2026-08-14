@@ -877,3 +877,56 @@ html,body{background:radial-gradient(circle at 50% 35%,#102d43 0,#050b13 48%,#02
 
 /* ===== MULTIPLAYER ONLINE ===== */
 .online-overlay{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;background:radial-gradient(circle at 50% 30%,rgba(30,80,130,.35),rgba(2,7,15,.96) 65%);backdrop-filter:blur(8px);padding:20px}.online-card{width:min(560px,94vw);padding:30px;border:1px solid rgba(80,190,255,.45);border-radius:24px;background:linear-gradient(145deg,rgba(10,22,38,.98),rgba(4,10,18,.98));box-shadow:0 0 60px rgba(0,180,255,.18),0 30px 90px #000;color:#fff;text-align:center}.online-badge{display:inline-block;color:#63f58b;font-weight:800;font-size:12px;letter-spacing:2px;margin-bottom:8px}.online-card h2{margin:6px 0 8px;font-size:30px}.online-card p{color:#a8b8cc}.online-card input{width:100%;padding:14px 16px;margin:7px 0;border-radius:12px;border:1px solid #30465f;background:#0b1522;color:#fff;font-size:16px;outline:none}.online-card input:focus{border-color:#39b9ff;box-shadow:0 0 0 3px rgba(57,185,255,.12)}.online-card .btn{width:100%;margin:7px 0}.online-sep{margin:10px;color:#687b90;font-size:12px;font-weight:800}.room-code{font-size:14px;color:#9db0c5;margin:12px 0}.room-code strong{display:block;font-size:34px;letter-spacing:8px;color:#fff;text-shadow:0 0 18px rgba(57,185,255,.5)}#onlinePlayers{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:16px 0;text-align:left}.online-player{padding:12px;border-radius:12px;background:#0c1827;border:1px solid #23364c}.online-player.ready{border-color:#24d96b}.online-player small{display:block;color:#6f8298}.online-card small{display:block;color:#64788f;margin-top:12px}.online-turn-lock{opacity:.55;filter:grayscale(.25)}@media(max-width:600px){#onlinePlayers{grid-template-columns:1fr}.online-card{padding:22px}.online-card h2{font-size:24px}}
+/* ===== BOTÃO JOGAR DADO - ACESSO RÁPIDO ===== */
+
+#btnDado {
+    position: fixed !important;
+    left: 50% !important;
+    bottom: 22px !important;
+    transform: translateX(-50%) !important;
+
+    z-index: 9999 !important;
+
+    min-width: 280px;
+    min-height: 64px;
+
+    padding: 14px 30px;
+
+    border: 2px solid rgba(255,255,255,.35);
+    border-radius: 18px;
+
+    background: linear-gradient(135deg, #19d86b, #08a957);
+
+    color: white;
+    font-size: 22px;
+    font-weight: 900;
+
+    cursor: pointer;
+
+    box-shadow:
+        0 8px 25px rgba(0,0,0,.55),
+        0 0 25px rgba(25,216,107,.45);
+
+    transition: .2s ease;
+}
+
+#btnDado:hover {
+    transform: translateX(-50%) scale(1.06) !important;
+    filter: brightness(1.12);
+}
+
+#btnDado:active {
+    transform: translateX(-50%) scale(.97) !important;
+}
+
+/* Celular */
+@media (max-width: 650px) {
+    #btnDado {
+        bottom: 12px !important;
+        min-width: 220px;
+        min-height: 54px;
+        padding: 10px 20px;
+        font-size: 18px;
+        border-radius: 15px;
+    }
+}

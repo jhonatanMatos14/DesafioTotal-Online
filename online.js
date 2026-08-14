@@ -102,12 +102,43 @@
   }
   function sendAction(type,payload={}){ socket.emit('playerAction',{type,...payload}); }
 
-  // On guests, turn controls become remote commands instead of local game logic.
-  document.addEventListener('click', e=>{
-    if(isHost || !started) return;
-    if(e.target.closest('#btnDado')){ if(me?.index===jogadorAtual) {e.preventDefault();e.stopImmediatePropagation();sendAction('roll');} else {e.preventDefault();e.stopImmediatePropagation();} }
-    if(e.target.closest('#btnReiniciar')||e.target.closest('#btnMenu')){e.preventDefault();e.stopImmediatePropagation();}
-  }, true);
+  // Controle de turno para TODOS os jogadores, inclusive o HOST.
+document.addEventListener('click', e => {
+
+    if (!started) return;
+
+    // Controle do botão de dado
+    if (e.target.closest('#btnDado')) {
+
+        // NÃO é a vez deste jogador
+        if (!me || Number(me.index) !== Number(jogadorAtual)) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            return;
+        }
+
+        // É a vez de um convidado
+        if (!isHost) {
+            e.preventDefault();
+            e.stopImmediatePropagation();
+            sendAction('roll');
+            return;
+        }
+
+        // É a vez do HOST:
+        // deixa o jogo executar o jogarDado() normalmente.
+    }
+
+    // Bloqueia reiniciar/menu durante a partida
+    if (
+        e.target.closest('#btnReiniciar') ||
+        e.target.closest('#btnMenu')
+    ) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+    }
+
+}, true);
 
   // Host executes commands from guests. The existing game functions remain the source of truth.
   socket.on('remoteAction', action=>{

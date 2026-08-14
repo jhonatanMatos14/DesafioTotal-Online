@@ -203,4 +203,10 @@
   document.addEventListener('click', e => {
     if (e.target.closest('#btnDado')) setTimeout(animatePieces, 120);
   });
+
+  // Mantém o indicador visual final do tabuleiro já usado no projeto.
+  const visual = document.createElement('script');
+  visual.src = 'board-final.js?v=3';
+  visual.defer = true;
+  document.head.appendChild(visual);
 })();

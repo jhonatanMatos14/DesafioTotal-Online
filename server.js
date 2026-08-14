@@ -15,11 +15,14 @@ app.get('/', (_req, res) => {
     const tags = [
       '<link rel="stylesheet" href="board-size.css?v=1">',
       '<script src="extras.js"></script>',
-      '<script src="reward-system.js?v=1"></script>'
+      '<script src="reward-system.js?v=1"></script>',
+      '<script src="achievements-system.js?v=1"></script>',
+      '<script src="path-system.js?v=1"></script>'
     ];
     if (!html.includes(tags[0])) html = html.replace('</head>', `${tags[0]}\n</head>`);
-    if (!html.includes(tags[1])) html = html.replace('</body>', `${tags[1]}\n</body>`);
-    if (!html.includes(tags[2])) html = html.replace('</body>', `${tags[2]}\n</body>`);
+    for (const tag of tags.slice(1)) {
+      if (!html.includes(tag)) html = html.replace('</body>', `${tag}\n</body>`);
+    }
     res.type('html').send(html);
   } catch (error) { res.status(500).send('Erro ao carregar o jogo.'); }
 });

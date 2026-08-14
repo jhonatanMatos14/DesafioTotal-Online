@@ -1,3 +1,5 @@
+@import url('board-final.css');
+
 /* ===== VISUAL BOARD UPGRADE ===== */
 .area-tabuleiro{justify-content:center}
 .tabuleiro{width:min(100%,1120px);aspect-ratio:1.38/1;min-height:820px;padding:34px;gap:11px;border-width:10px;border-radius:34px}

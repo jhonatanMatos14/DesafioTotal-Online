@@ -6,7 +6,14 @@ const { Server } = require('socket.io');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: '*' }, transports: ['websocket', 'polling'] });
+const io = new Server(server, {
+  cors: { origin: '*' },
+  transports: ['websocket', 'polling'],
+  connectionStateRecovery: {
+    maxDisconnectionDuration: 120000,
+    skipMiddlewares: true
+  }
+});
 const ROOT = __dirname;
 
 app.get('/', (_req, res) => {
@@ -29,6 +36,7 @@ app.get('/', (_req, res) => {
 
 app.use(express.static(ROOT));
 const rooms = new Map();
+const disconnectTimers = new Map();
 const COLORS = ['#ef4444','#3b82f6','#22c55e','#eab308','#a855f7','#f97316','#ec4899','#06b6d4'];
 const ALLOWED_ACTIONS = new Set(['roll','answerQuestion','answerChallenge','useCard','concludeChaos']);
 app.get('/health', (_req,res) => res.json({ok:true,rooms:rooms.size}));
@@ -38,7 +46,68 @@ function roomInfo(room){return{code:room.code,started:room.started,hostId:room.h
 function broadcastRoom(room){io.to(room.code).emit('roomUpdate',roomInfo(room));}
 function getRoom(socket){return socket.data.room?rooms.get(socket.data.room):null;}
 
+function cancelDisconnectTimer(socketId) {
+  const timer = disconnectTimers.get(socketId);
+  if (timer) clearTimeout(timer);
+  disconnectTimers.delete(socketId);
+}
+
+function scheduleDisconnect(socket) {
+  cancelDisconnectTimer(socket.id);
+  const roomCode = socket.data.room;
+  if (!roomCode) return;
+
+  const timer = setTimeout(() => {
+    disconnectTimers.delete(socket.id);
+    const room = rooms.get(roomCode);
+    if (!room) return;
+
+    const playerStillExists = room.players.some(player => player.id === socket.id);
+    if (!playerStillExists) return;
+
+    if (room.hostId === socket.id) {
+      io.to(room.code).emit('hostDisconnected');
+      rooms.delete(room.code);
+      return;
+    }
+
+    room.players = room.players.filter(player => player.id !== socket.id);
+    room.players.forEach((player, index) => {
+      player.index = index;
+      const member = io.sockets.sockets.get(player.id);
+      if (member) member.data.index = index;
+    });
+
+    if (!room.players.length) {
+      rooms.delete(room.code);
+      return;
+    }
+
+    if (room.state) {
+      const current = Number(room.state.jogadorAtual);
+      room.state.jogadorAtual = Math.max(0, Math.min(current, room.players.length - 1));
+    }
+
+    broadcastRoom(room);
+  }, 120000);
+
+  disconnectTimers.set(socket.id, timer);
+}
+
 io.on('connection', socket => {
+  // Socket.IO Connection State Recovery pode restaurar automaticamente
+  // socket.id, rooms e socket.data depois de uma queda curta.
+  if (socket.recovered) {
+    cancelDisconnectTimer(socket.id);
+    const recoveredRoom = getRoom(socket);
+    if (recoveredRoom) {
+      broadcastRoom(recoveredRoom);
+      if (recoveredRoom.started && recoveredRoom.lastPublishedState) {
+        socket.emit('stateUpdate', recoveredRoom.lastPublishedState);
+      }
+    }
+  }
+
   socket.on('createRoom',({name}={})=>{
     if(socket.data.room)return socket.emit('errorMessage','Você já está em uma sala.');
     name=String(name||'Jogador 1').trim().slice(0,20)||'Jogador 1';const roomCode=code();
@@ -66,6 +135,10 @@ io.on('connection', socket => {
     room.state={jogadorAtual:Number.isInteger(Number(state.jogadorAtual))?Number(state.jogadorAtual):0,partidaTerminou:!!state.partidaTerminou};
     const stateKey=JSON.stringify(state);if(stateKey===room.lastPublishedState)return;room.lastPublishedState=stateKey;socket.to(room.code).emit('stateUpdate',state);
   });
-  socket.on('disconnect',()=>{const room=getRoom(socket);if(!room)return;if(room.hostId===socket.id){io.to(room.code).emit('hostDisconnected');rooms.delete(room.code);return;}room.players=room.players.filter(p=>p.id!==socket.id);room.players.forEach((p,index)=>{p.index=index;const member=io.sockets.sockets.get(p.id);if(member)member.data.index=index;});if(!room.players.length){rooms.delete(room.code);return;}if(room.state){const current=Number(room.state.jogadorAtual);room.state.jogadorAtual=Math.max(0,Math.min(current,room.players.length-1));}broadcastRoom(room);});
+  socket.on('disconnect',()=>{
+    // Não remove o jogador imediatamente. O Socket.IO tenta recuperar a
+    // sessão por até 120s; somente depois disso a vaga é liberada.
+    scheduleDisconnect(socket);
+  });
 });
 const PORT=process.env.PORT||3000;server.listen(PORT,()=>console.log(`Desafio Total Online: http://localhost:${PORT}`));

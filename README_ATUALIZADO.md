@@ -1,6 +1,6 @@
 # Desafio Total Online — versão atualizada
 
-Esta versão inclui o multiplayer com Node.js + Socket.IO, salas por código, sincronização de partida e reconexão real após quedas curtas de internet.
+Esta versão inclui o multiplayer com Node.js + Socket.IO, salas por código, sincronização de partida, reconexão real após quedas curtas de internet e matchmaking rápido.
 
 ## Rodar no PC
 
@@ -28,3 +28,12 @@ Depois do deploy, use a URL HTTPS pública fornecida pelo serviço e compartilhe
 - O jogador recuperado mantém a sala e o estado da partida.
 - O host também pode reconectar dentro desse período.
 - Se a conexão não voltar dentro do prazo, o jogador é removido e a sala é atualizada.
+
+## V112 — Matchmaking rápido
+
+- Botão **ENCONTRAR PARTIDA** na tela online.
+- Jogadores entram em uma fila automática.
+- Quando dois jogadores estão disponíveis, o servidor cria uma sala automaticamente.
+- Os dois entram na mesma partida sem precisar compartilhar código.
+- A partida começa automaticamente assim que o par é encontrado.
+- É possível cancelar a busca antes de encontrar um adversário.
